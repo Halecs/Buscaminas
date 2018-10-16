@@ -18,9 +18,10 @@ class Buscaminas{
       srand(time(NULL)); 
       nMinas_=20;         
      }
-     void generarBuscaminas();
 
-
+    void generarPartida();
+    void imprimir();
+    void ponerBandera(int i,int j, int jugador);
 
 
 };
@@ -34,7 +35,9 @@ struct casilla{
     bandera=2 ----> Bandera jugador 2
     bandera=3 ----> Bandera ambos jugadores
     */
+
     int bandera;
     bool mina;
+    bool descubierto;
     };
 #endif
