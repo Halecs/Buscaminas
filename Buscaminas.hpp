@@ -21,8 +21,8 @@ class Buscaminas{
 
     void generarPartida();
     void imprimir();
-    void ponerBandera(int i,int j, int jugador);
-
+    bool ponerBandera(int i,int j, int jugador);
+    int  descubrirCasilla(int i, int j, int jugador);
 
 };
 

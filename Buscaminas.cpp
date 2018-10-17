@@ -22,8 +22,10 @@ void Buscaminas::generarMinas(){
      int numAl=rand();
      int x=numAl%10;
      int y=(numAl%100)/10;
-      if(buscaminas_[x][y].mina==true) i--;
-      else buscaminas_[x][y].mina==true;
+      if(buscaminas_[x][y].mina==true) 
+      	i--;
+      else 
+      	buscaminas_[x][y].mina=true;
   }
 }
 
@@ -36,9 +38,9 @@ void Buscaminas::generarNumeros(){
 
          if(!buscaminas_[i][j].mina){
           
-              for(int k=i-1;k<i+1;k++){  
+              for(int k=i-1;k<=i+1;k++){  
   
-                 for(int l=j-1;l<j+1;l++){
+                 for(int l=j-1;l<=j+1;l++){
                    
                    if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())){
 
@@ -63,7 +65,6 @@ void Buscaminas::generarNumeros(){
 void Buscaminas::imprimir()
 {
 
-  // Imprimir banderas?
   // ¿Imprimir mina?
   for (int i = 0; i < buscaminas_.size(); ++i)
   {
@@ -71,15 +72,44 @@ void Buscaminas::imprimir()
     for (int j = 0; j < buscaminas_.size(); ++j)
     {
       if(buscaminas_[i][j].descubierto)
-        cout<<buscaminas_[i][j].minasAlrededor;
+        cout<<buscaminas_[i][j].minasAlrededor<<" ";
       else
-        cout<<"- ";
+      	if(bandera == 0)
+        	cout<<"- ";
+        else
+        	if(bandera == 1)
+        		cout<<"b1 ";
+        	else if(bandera == 2)
+        		cout<<"b2 ";
+        		else if(bandera == 3)
+        			cout<<"b1/b2 ";
     }
   }
 }
 
-void ponerBandera(int i,int j, int jugador)
+bool ponerBandera(int i,int j, int jugador)
 {
+	/*Si no esta descubierta y el jugador no ha puesto una bandera ya ahí*/
   if(!buscaminas_[i][j].descubierto && buscaminas_[i][j].bandera != jugador && buscaminas_[i][j].bandera != 3)
+  {
     buscaminas_[i][j].bandera += jugador;
+  	return true;
+  }
+  else
+  	return false;
+}
+
+/*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
+int descubrirCasilla(int i,int j, int jugador)
+{
+	if(!buscaminas_[i][j].descubierto)
+	{
+		buscaminas_[i][j].descubierto == true;
+		if(buscaminas_[i][j].mina == true)
+			return 1;
+		else 
+			return 0;
+	}
+	else
+		return -1;
 }
