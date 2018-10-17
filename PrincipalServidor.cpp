@@ -14,6 +14,9 @@
 #include "Jugador.hpp"
 #include "Partida.hpp"
 
+
+bool ExisteJugador(std::std::vector<Jugador> v, Jugador j);
+
 int main(int argc, char const *argv[])
 {
 	int sd, new_sd; //Sockets 
@@ -66,6 +69,7 @@ int main(int argc, char const *argv[])
     {
     	auxfds = readfds;
         salida = select(FD_SETSIZE,&auxfds,NULL,NULL,NULL);
+
         if(salida > 0)
         {
         	/* Buscamos el socket que se ha establecido conexion*/
@@ -75,7 +79,6 @@ int main(int argc, char const *argv[])
             	{
             		if((new_sd = accept(sd, (struct sockaddr *)&from, &from_len)) == -1){
                         perror("Error aceptando peticiones\n");
-
                     }
                     else
                     {
@@ -85,12 +88,7 @@ int main(int argc, char const *argv[])
                     	aux.setEstado(0);
                     	string mensaje = "+ OK\n";
                     	send(aux.getSocket(),mensaje.c_str(),mensaje.size(),0);
-
-                    	/*nombre = mensajeRec;
-                    	if(NoExisteJugador(Jugadores, aux))
-                    		aux.setNombre(nombre);
-                    	else 
-                    		send(aux.getSocket(),mensajeError.c_str(),mensaje.size(),0);*/
+                        Jugadores.push_back(aux);
                     }
 
             	}
@@ -112,6 +110,10 @@ int main(int argc, char const *argv[])
             			close(sd);
             			exit(-1);
             		}
+                    else if("Lista de jugadores" == entrada)
+                    {
+                        //imprimir jugadores
+                    }
             	}
             	else
             	{
@@ -130,12 +132,12 @@ int main(int argc, char const *argv[])
 }
 
 
-bool NoExisteJugador(std::std::vector<Jugador> v, Jugador j)
+bool ExisteJugador(std::std::vector<Jugador> v, Jugador j)
 {
 	for (int i = 0; i < Jugador.size(); ++i)
 	{
 		if(j == v[i])
-			return false;
+			return true;
 	}
-	return true;
+	return false;
 }
