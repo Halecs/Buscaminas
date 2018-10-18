@@ -19,6 +19,9 @@ using namespace std;
 
 bool ExisteJugador(std::vector<Jugador> v, Jugador j);
 void imprimirJugadores(std::vector<Jugador> v);
+void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v);
+int localizaJugador(int socket, std::vector<Jugador> v);
+
 
 
 int main(int argc, char const *argv[])
@@ -27,10 +30,11 @@ int main(int argc, char const *argv[])
 	struct sockaddr_in sockname,from;
 	fd_set readfds, auxfds;
     socklen_t from_len;
-	int salida,on,ret;
+	int salida,on,ret, busca;
 
 	std::vector<Jugador> Jugadores;
 	//std::vector<Partida> Partidas;
+    //Necesitamos un vector de cola de emparejamiento
 
 	string mensajeError = "Error no se puede realizar la accion";
 	/* Abrimos socket*/
@@ -105,7 +109,7 @@ int main(int argc, char const *argv[])
             		/*Cogemos la cadena y comparamos con distintas opciones (SALIR, VER LISTA DE JUGADORES...) */
             		/* salir */
             		string entrada;
-                    getline(std::cin, entrada);
+                    getline(std::cin, entrada,'\n');
             		if("SALIR" == entrada)
             		{
             			for (int i = 0; i < Jugadores.size(); ++i)
@@ -127,6 +131,30 @@ int main(int argc, char const *argv[])
             		/*El usuario ha hecho algo*/
             		/* USUARIO, JUGAR, BUSCAR PARTIDA, LOGIN*/
             		/* 1º)	LOGIN*/
+                    bzero(buffer,sizeof(buffer));
+                    char buffer[50]
+                    recv(i,buffer,sizeof(buffer),0);
+                    if(buffer > 0)
+                    {
+                        /*Queda ver como se desconecta si esta en partida*/
+                        if(strcmp("Salir\n", buffer) == 0)
+                        {
+                            busca = localizaJugador(i,Jugadores);
+                            if(Jugadores[busca].getEstado() != 3 && Jugadores[busca].getEstado() != 4)
+                                salirCliente(i,&readfds,Jugadores);
+                            else // Si estan en partida o buscando
+                            {
+                                if(Jugadores[busca].getEstado() == 3)
+                                {
+
+                                }
+                                if(Jugadores[busca].getEstado() == 4)
+                                {
+
+                                }
+                            }
+                        }
+                    }
             		
             	}
             }
@@ -154,4 +182,28 @@ void imprimirJugadores(std::vector<Jugador> v)
 {
     for (int i = 0; i < v.size(); ++i)
         std::cout<<v[i].getNombre()<<std::endl;
+}
+
+void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v)
+{
+    char buffer[250];
+    close(socket);
+    FD_CLR(socket,readfds);
+    int aux;
+    for (int i = 0; i < v.size(); ++i)
+    {
+        if(socket == v[i].getSocket())
+            v[i].setEstado(5);
+    }
+    
+}
+
+int localizaJugador(int socket, std::vector<Jugador> v)
+{
+    for (int i = 0; i < v.size(); ++i)
+    {
+        if(v[i].getSocket() == socket)
+            return i;
+    }
+    return -1;
 }

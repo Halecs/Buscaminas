@@ -25,6 +25,7 @@ class Jugador{
     public:
      int getSocket(){return socket_;}
      std::string getNombre(){return nombre_;}
+     int getEstado(){return estado;}
      void setSocket(int socket){socket_=socket;}
      void setNombre(std::string nombre){nombre_=nombre;}
      void setEstado(int estado){estado_=estado;}
