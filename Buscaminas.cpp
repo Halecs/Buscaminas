@@ -1,6 +1,7 @@
 #include "Buscaminas.hpp"
 #include <vector>
 #include <cstdlib>
+#include <iostream>
 
 /* Inicializa todo*/
 void Buscaminas::generarPartida(){
@@ -68,26 +69,26 @@ void Buscaminas::imprimir()
   // ¿Imprimir mina?
   for (int i = 0; i < buscaminas_.size(); ++i)
   {
-    cout<<"\n";
+    std::cout<<"\n";
     for (int j = 0; j < buscaminas_.size(); ++j)
     {
       if(buscaminas_[i][j].descubierto)
-        cout<<buscaminas_[i][j].minasAlrededor<<" ";
+        std::cout<<buscaminas_[i][j].minasAlrededor<<" ";
       else
-      	if(bandera == 0)
-        	cout<<"- ";
+      	if(buscaminas_[i][j].bandera == 0)
+        	std::cout<<"- ";
         else
-        	if(bandera == 1)
-        		cout<<"b1 ";
-        	else if(bandera == 2)
-        		cout<<"b2 ";
-        		else if(bandera == 3)
-        			cout<<"b1/b2 ";
+        	if(buscaminas_[i][j].bandera == 1)
+        		std::cout<<"b1 ";
+        	else if(buscaminas_[i][j].bandera == 2)
+        		std::cout<<"b2 ";
+        		else if(buscaminas_[i][j].bandera == 3)
+        			std::cout<<"b1/b2 ";
     }
   }
 }
 
-bool ponerBandera(int i,int j, int jugador)
+bool Buscaminas::ponerBandera(int i,int j, int jugador)
 {
 	/*Si no esta descubierta y el jugador no ha puesto una bandera ya ahí*/
   if(!buscaminas_[i][j].descubierto && buscaminas_[i][j].bandera != jugador && buscaminas_[i][j].bandera != 3)
@@ -100,7 +101,7 @@ bool ponerBandera(int i,int j, int jugador)
 }
 
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
-int descubrirCasilla(int i,int j, int jugador)
+int Buscaminas::descubrirCasilla(int i,int j, int jugador)
 {
 	if(!buscaminas_[i][j].descubierto)
 	{

@@ -10,22 +10,27 @@
 #include <ctime>
 #include <arpa/inet.h>
 #include <vector>
+#include <iostream>
 
 #include "Jugador.hpp"
-#include "Partida.hpp"
+//#include "Partida.hpp"
 
+using namespace std;
 
-bool ExisteJugador(std::std::vector<Jugador> v, Jugador j);
+bool ExisteJugador(std::vector<Jugador> v, Jugador j);
+void imprimirJugadores(std::vector<Jugador> v);
+
 
 int main(int argc, char const *argv[])
 {
 	int sd, new_sd; //Sockets 
 	struct sockaddr_in sockname,from;
 	fd_set readfds, auxfds;
-	int salida,ret;
+    socklen_t from_len;
+	int salida,on,ret;
 
 	std::vector<Jugador> Jugadores;
-	std::vector<Partida> Partidas;
+	//std::vector<Partida> Partidas;
 
 	string mensajeError = "Error no se puede realizar la accion";
 	/* Abrimos socket*/
@@ -72,6 +77,8 @@ int main(int argc, char const *argv[])
 
         if(salida > 0)
         {
+            for(int i=0; i<FD_SETSIZE; i++){
+
         	/* Buscamos el socket que se ha establecido conexion*/
             if(FD_ISSET(i, &auxfds))
             {
@@ -98,21 +105,21 @@ int main(int argc, char const *argv[])
             		/*Cogemos la cadena y comparamos con distintas opciones (SALIR, VER LISTA DE JUGADORES...) */
             		/* salir */
             		string entrada;
-            		fgets(entrada, sizeof(entrada),stdin);
+                    getline(std::cin, entrada);
             		if("SALIR" == entrada)
             		{
             			for (int i = 0; i < Jugadores.size(); ++i)
             			{
-            				send(Jugadores[i], "Desconexion servidor\n", strlen("Desconexion servidor\n"),0);
-                            close(Jugadores[i]);
-                            FD_CLR(Jugadores[i],&readfds);
+            				send(Jugadores[i].getSocket(), "Desconexion servidor\n", sizeof("Desconexion servidor\n"),0);
+                            close(Jugadores[i].getSocket());
+                            FD_CLR(Jugadores[i].getSocket(),&readfds);
             			}
             			close(sd);
             			exit(-1);
             		}
                     else if("Lista de jugadores" == entrada)
                     {
-                        //imprimir jugadores
+                        imprimirJugadores(Jugadores);
                     }
             	}
             	else
@@ -123,6 +130,7 @@ int main(int argc, char const *argv[])
             		
             	}
             }
+            }
 
         }
 
@@ -132,12 +140,18 @@ int main(int argc, char const *argv[])
 }
 
 
-bool ExisteJugador(std::std::vector<Jugador> v, Jugador j)
+bool ExisteJugador(std::vector<Jugador> v, Jugador j)
 {
-	for (int i = 0; i < Jugador.size(); ++i)
+	for (int i = 0; i < v.size(); ++i)
 	{
 		if(j == v[i])
 			return true;
 	}
 	return false;
+}
+
+void imprimirJugadores(std::vector<Jugador> v)
+{
+    for (int i = 0; i < v.size(); ++i)
+        std::cout<<v[i].getNombre()<<std::endl;
 }
