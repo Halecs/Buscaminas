@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include<signal.h>
 #include <unistd.h>
 #include <ctime>
@@ -13,7 +14,7 @@
 #include <iostream>
 
 #include "Jugador.hpp"
-//#include "Partida.hpp"
+#include "Partida.hpp"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ int main(int argc, char const *argv[])
 	int salida,on,ret, busca;
 
 	std::vector<Jugador> Jugadores;
-	//std::vector<Partida> Partidas;
+	std::vector<Partida> Partidas;
     //Necesitamos un vector de cola de emparejamiento
 
 	string mensajeError = "Error no se puede realizar la accion";
@@ -131,8 +132,8 @@ int main(int argc, char const *argv[])
             		/*El usuario ha hecho algo*/
             		/* USUARIO, JUGAR, BUSCAR PARTIDA, LOGIN*/
             		/* 1º)	LOGIN*/
+                    char buffer[50];
                     bzero(buffer,sizeof(buffer));
-                    char buffer[50]
                     recv(i,buffer,sizeof(buffer),0);
                     if(buffer > 0)
                     {

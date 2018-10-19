@@ -22,10 +22,13 @@ class Jugador{
      std::string nombre_;
      std::string password_;
      int estado_;
+     int partida_;
     public:
      int getSocket(){return socket_;}
      std::string getNombre(){return nombre_;}
-     int getEstado(){return estado;}
+     int getEstado(){return estado_;}
+     int getPartida(){return partida_;}
+     void setPartida(int partida){partida_=partida;}
      void setSocket(int socket){socket_=socket;}
      void setNombre(std::string nombre){nombre_=nombre;}
      void setEstado(int estado){estado_=estado;}
@@ -34,7 +37,7 @@ class Jugador{
                      if(this->nombre_==j.nombre_) return true;
                      else return false;
        }
-
+    
 
 
 };

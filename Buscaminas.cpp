@@ -79,20 +79,23 @@ void Buscaminas::imprimir()
         	std::cout<<"- ";
         else
         	if(buscaminas_[i][j].bandera == 1)
-        		std::cout<<"b1 ";
+        		std::cout<<"A ";
         	else if(buscaminas_[i][j].bandera == 2)
-        		std::cout<<"b2 ";
+        		std::cout<<"B ";
         		else if(buscaminas_[i][j].bandera == 3)
-        			std::cout<<"b1/b2 ";
+        			std::cout<<"AB ";
     }
   }
 }
+
+
 
 bool Buscaminas::ponerBandera(int i,int j, int jugador)
 {
 	/*Si no esta descubierta y el jugador no ha puesto una bandera ya ahí*/
   if(!buscaminas_[i][j].descubierto && buscaminas_[i][j].bandera != jugador && buscaminas_[i][j].bandera != 3)
   {
+    nBanderas_[jugador]++;
     buscaminas_[i][j].bandera += jugador;
   	return true;
   }
@@ -101,11 +104,23 @@ bool Buscaminas::ponerBandera(int i,int j, int jugador)
 }
 
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
-int Buscaminas::descubrirCasilla(int i,int j, int jugador)
+int Buscaminas::descubrirCasilla(int i,int j)
 {
 	if(!buscaminas_[i][j].descubierto)
 	{
 		buscaminas_[i][j].descubierto == true;
+                if(buscaminas_[i][j].minasAlrededor==0){
+                    for(int k=i-1;k<=i+1;k++){  
+  
+                      for(int l=j-1;l<=j+1;l++){
+                   
+                         if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())){
+                               
+                              descubrirCasilla(k,l);
+                          } 
+                      }
+                    }
+                }
 		if(buscaminas_[i][j].mina == true)
 			return 1;
 		else 

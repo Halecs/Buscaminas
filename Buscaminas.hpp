@@ -24,22 +24,24 @@ class Buscaminas{
    private:
     std::vector < std::vector<casilla> > buscaminas_;
     int nMinas_;
+    std::vector<int> nBanderas_;
     void generarMinas();
     void generarNumeros();
     
    public:
-    Buscaminas(int nMinas){
+    Buscaminas(){
       buscaminas_.resize(10);
       for(int i=0;i<10;i++)
           buscaminas_[i].resize(10);  
       srand(time(NULL)); 
+      nBanderas_.resize(2,0);
       nMinas_=20;         
      }
-
+    int getBanderasJugador(int jugador){return nBanderas_[jugador];}
     void generarPartida();
     void imprimir();
     bool ponerBandera(int i,int j, int jugador);
-    int  descubrirCasilla(int i, int j, int jugador);
+    int  descubrirCasilla(int i, int j);
 
 };
 
