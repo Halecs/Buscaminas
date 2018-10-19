@@ -36,6 +36,7 @@ int main(int argc, char const *argv[])
 	std::vector<Jugador> Jugadores;
 	std::vector<Partida> Partidas;
     //Necesitamos un vector de cola de emparejamiento
+    std::vector<Jugador> Cola;
 
 	string mensajeError = "Error no se puede realizar la accion";
 	/* Abrimos socket*/
@@ -145,13 +146,20 @@ int main(int argc, char const *argv[])
                                 salirCliente(i,&readfds,Jugadores);
                             else // Si estan en partida o buscando
                             {
+                                //Registrado buscando partida
                                 if(Jugadores[busca].getEstado() == 3)
-                                {
-
+                                {   
+                                    for (int i = 0; i < Cola.size(); ++i)
+                                    {
+                                        if(Cola[i].getSocket() == Jugadores[busca].getSocket())
+                                            Cola.erase(Cola.begin() + (i-1)); //???
+                                        Jugadores[busca].setEstado(DESCONECTADO);
+                                    }
                                 }
+                                //En partida
                                 if(Jugadores[busca].getEstado() == 4)
                                 {
-
+                                    
                                 }
                             }
                         }

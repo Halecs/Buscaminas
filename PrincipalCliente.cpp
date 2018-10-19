@@ -23,7 +23,8 @@ int main(){
 		perror("No se puede abrir el socket cliente\n");
     		exit (1);	
 	}
- sockname.sin_family = AF_INET;
+
+ 	sockname.sin_family = AF_INET;
 	sockname.sin_port = htons(2000);
 	sockname.sin_addr.s_addr =  inet_addr("127.0.0.1");
 
@@ -40,6 +41,37 @@ int main(){
     
     FD_SET(0,&readfds);
     FD_SET(sd,&readfds);
+
+    char buffer[250];
+    
+    do
+    {
+    	auxfds = readfds;
+        salida = select(sd+1,&auxfds,NULL,NULL,NULL);
+
+        //Si tengo un mensaje del servidor
+        if(FD_ISSET(sd, &auxfds))
+        {
+        	bzero(buffer,sizeof(buffer));
+            recv(sd,buffer,sizeof(buffer),0);
+            printf("\n%s\n",buffer);
+            
+        }
+        else
+        {
+        	//Introducido informacion por teclado
+            if(FD_ISSET(0,&auxfds))
+            {
+                bzero(buffer,sizeof(buffer));
+                fgets(buffer,sizeof(buffer),stdin);
+                if(strcmp(buffer,"SALIR\n") == 0)
+                	fin == 1;
+
+            }
+
+        }
+
+    }while(fin == 0);
   return 0;
    }
 
