@@ -39,6 +39,8 @@ int main(int argc, char const *argv[])
     std::vector<Jugador> Cola;
 
 	string mensajeError = "Error no se puede realizar la accion";
+    string mensajeDesconexionPartida = "Un jugador se ha desconectado de la partida";
+    string mensajeDesconexionPartida2 = "Te has desconectado de la partida";
 	/* Abrimos socket*/
 	sd = socket (AF_INET, SOCK_STREAM, 0);
 	if (sd == -1)
@@ -159,7 +161,24 @@ int main(int argc, char const *argv[])
                                 //En partida
                                 if(Jugadores[busca].getEstado() == 4)
                                 {
-                                    
+                                    int partida = buscarJugadorPartida(Jugadores[busca], Cola); //Encontramos la partida
+                                    int elotro = Partidas[partida].encontrarJugadorOponente(Jugadores[busca].getSocket()); //Buscamos el socket del otro jugador de la partida
+                                    if(elotro == 0) // El jugador 1 es el que se va a salir
+                                    {
+                                        send(Jugadores[busca].getSocket(),mensajeDesconexionPartida2.c_str(),sizeof(mensajeDesconexionPartida2),0);
+                                        send(Partidas[partida].socketJugador1(),mensajeDesconexionPartida.c_str(),sizeof(mensajeDesconexionPartida),0);
+                                        Jugadores[busca].setEstado(DESCONECTADO);
+                                        Jugadores[localizaJugador(Partidas[partida].Jugador1.getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                            
+                                    }
+                                    else
+                                    {
+                                        send(Jugadores[busca].getSocket(),mensajeDesconexionPartida2.c_str(),sizeof(mensajeDesconexionPartida2),0);
+                                        send(Partidas[partida].socketJugador2(),mensajeDesconexionPartida.c_str(),sizeof(mensajeDesconexionPartida),0);
+                                        Jugadores[busca].setEstado(DESCONECTADO);
+                                        Jugadores[localizaJugador(Partidas[partida].Jugador2.getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                    }
+                                    //Volver a poner en cola quizas mas adelante
                                 }
                             }
                         }
@@ -215,4 +234,14 @@ int localizaJugador(int socket, std::vector<Jugador> v)
             return i;
     }
     return -1;
+}
+
+int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas;)
+{
+  for (int i = 0; i <partidas.size() ; ++i)
+  {
+    if(partidas[i].jugador1(j.getSocket()) or partidas[i].jugador2(j.getSocket()))
+        return i;
+  }
+  return -1;
 }
