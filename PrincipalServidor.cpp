@@ -137,8 +137,8 @@ int main(int argc, char const *argv[])
             		/* 1º)	LOGIN*/
                     char buffer[50];
                     bzero(buffer,sizeof(buffer));
-                    recv(i,buffer,sizeof(buffer),0);
-                    if(buffer > 0)
+                    int recibido = recv(i,buffer,sizeof(buffer),0);
+                    if(recibido > 0)
                     {
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strcmp("Salir\n", buffer) == 0)
@@ -151,10 +151,10 @@ int main(int argc, char const *argv[])
                                 //Registrado buscando partida
                                 if(Jugadores[busca].getEstado() == 3)
                                 {   
-                                    for (int i = 0; i < Cola.size(); ++i)
+                                    for (int l = 0; l < Cola.size(); ++l)
                                     {
-                                        if(Cola[i].getSocket() == Jugadores[busca].getSocket())
-                                            Cola.erase(Cola.begin() + (i-1)); //???
+                                        if(Cola[l].getSocket() == Jugadores[busca].getSocket())
+                                            Cola.erase(Cola.begin() + (l-1)); //???
                                         Jugadores[busca].setEstado(DESCONECTADO);
                                     }
                                 }
@@ -181,6 +181,26 @@ int main(int argc, char const *argv[])
                                     //Volver a poner en cola quizas mas adelante
                                 }
                             }
+                        }
+
+                        if(strcmp("Usuario\n",buffer) == 0)
+                        {
+                            string usuario;
+                            busca = localizaJugador(i,Jugadores);
+                            if(Jugadores[busca].getEstado() == 0)
+                            {
+                                //Comprobamos que sea correcto el usuario o lo dejamos a libre eleccion????
+                                if(Jugadores[busca].getNombre() != NULL)
+                                    send(Jugadores[busca].getSocket(),"Introduzca nombre de usuario por primera vez\n".sizeof("Introduzca nombre de usuario por primera vez\n"),0);
+                                    recv(Jugadores[busca].getSocket,usuario.c_str(),sizeof(usuario),0);
+                                    Jugadores[busca].setNombre(usuario);
+                                else
+                                    send(Jugadores[busca].getSocket(),"Introduzca nombre de usuario\n".sizeof("Introduzca nombre de usuario\n"),0);
+                                    recv(Jugadores[busca].getSocket,usuario.c_str(),sizeof(usuario),0);
+                                    Jugadores[busca].setNombre(usuario);
+                            }
+                            else
+                                send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
                         }
                     }
             		
