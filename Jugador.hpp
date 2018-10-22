@@ -8,6 +8,7 @@
 #define REGISTRADO_BUSCANDO_PARTIDA 3
 #define REGISTRADO_JUGANDO 4
 #define DESCONECTADO 5
+#define REGISTRADO_SIN_CONECTAR 6
 /*Estados del jugador
    0->Conectado sin registrar
    1->Esperando contraseña
@@ -15,6 +16,7 @@
    3->Registrado buscando partida
    4->Registrado jugando
    5->Desconectado
+   6->Registrado sin conectar
 */
 class Jugador{
     private:
@@ -28,7 +30,7 @@ class Jugador{
      std::string getNombre(){return nombre_;}
      int getEstado(){return estado_;}
      int getPartida(){return partida_;}
-     int getPassword(){return password_;}
+     std::string getPassword(){return password_;}
      void setPartida(int partida){partida_=partida;}
      void setSocket(int socket){socket_=socket;}
      void setNombre(std::string nombre){nombre_=nombre;}

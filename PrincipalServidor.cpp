@@ -23,7 +23,7 @@ bool ExisteJugador(std::vector<Jugador> v, Jugador j);
 void imprimirJugadores(std::vector<Jugador> v);
 void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v);
 int localizaJugador(int socket, std::vector<Jugador> v);
-
+bool ExisteJugador(std::vector<Jugador> v, string j);
 
 
 int main(int argc, char const *argv[])
@@ -188,43 +188,77 @@ int main(int argc, char const *argv[])
 
 
 
-                        if(strncmp("USUARIO ",buffer,8) == 0)
+                        if(strncmp("USUARIO ",buffer,7) == 0)
                         {
                             char usuarioAux[50];
-                            string password,user=buffer;
+                            string user=buffer;
                             user.copy(usuarioAux,50,8);
 			    string usuario=usuarioAux;
                             busca = localizaJugador(i,Jugadores);
-                            if(Jugadores[busca].getEstado() == SIN_REGISTRAR)
+                            if(Jugadores[busca].getEstado() == REGISTRADO_SIN_CONECTAR)
                             {
-                                //Comprobamos que sea correcto el usuario o lo dejamos a libre eleccion????
-                                if(Jugadores[busca].getNombre() != "")
+
+                                if(Jugadores[busca].getNombre().length() != 0)
                                 {
                                     if(Jugadores[busca].getNombre()==nombre){
-                                      send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\nIntroduzca contraseña:",sizeof("+Ok. Usuario correcto\nIntroduzca contraseña:"),0);
-                                      recv(Jugadores[busca].getSocket,password,sizeof(password),0);
-                                      if(strncmp("PASSWORD ",password.c_str(),9)!=0) 
-                                         send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
-                                      else
-                                         {    
-                                        if(Jugadores[busca].getPassword()==password )
+                                      send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
+                                      Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
+                                     }
+                                 else
+                                      send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+                                }
+                               else 
+                                   send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+                            } 
+                            else 
+                               send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+               
+                        }
+
+                        if(strncmp("PASSWORD ",password.c_str(),8)==0){
+                              char passwordAux[50];
+                              string pass=buffer;
+                              pass.copy(passwordAux,50,9);
+			      string password=usuarioAux;
+                              busca = localizaJugador(i,Jugadores);
+                             if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
+                              {
+                                 if(Jugadores[busca].getNombre().length() != 0){
+                                       if(Jugadores[busca].getPassword()==password ){
                                            send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
+                                           Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);   
+                                            }
                                         else 
                                             send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
                                          }
-                                       }  
                                     else 
-                                       send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
-                            }
-                            else
-                                send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+                                       send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
+                                   }
+                                 else 
+                                   send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
                              }
-                            } 
-               
+                         
                         if(strncmp("REGISTRO ",buffer,9)==0){
-
-
-
+                            string aux=buffer; 
+                            size_t foundName=aux.find("-u ");
+                            size_t foundPass=aux.find("-p ");
+                            if((foundName==string::npos)||(foundPass==string::npos))
+                                send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
+                            else{
+                                if(foundName<foundPass){
+                                  char nom[50],pass[50];
+                                  string nombre,password;
+                                  int namesize=foundPass-foundName-3);
+                                  aux.copy(nom,namesize,foundName+3);
+                                  aux.copy(pass,50,foundPass+3)
+                                  nombre=nom; password=pass;
+                                  if(ExisteJugador(Jugadores,nombre))
+                                     send(Jugadores[busca].getSocket(),"Nombre ya usado\n",sizeof("Nombre ya usado\n"),0);  
+                                  else{
+                                    
+                                   }                                 
+                                  }
+                             }    
 
                         }
                     }
@@ -240,6 +274,15 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
+bool ExisteJugador(std::vector<Jugador> v, string j)
+{
+	for (int i = 0; i < v.size(); ++i)
+	{
+		if(j == v[i].getNombre())
+			return true;
+	}
+	return false;
+}
 
 bool ExisteJugador(std::vector<Jugador> v, Jugador j)
 {
