@@ -11,6 +11,7 @@
 #include <ctime>
 #include <arpa/inet.h>
 #include <vector>
+#include <queue>
 #include <iostream>
 
 #include "Jugador.hpp"
@@ -140,6 +141,8 @@ int main(int argc, char const *argv[])
                     int recibido = recv(i,buffer,sizeof(buffer),0);
                     if(recibido > 0)
                     {
+
+
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strcmp("Salir\n", buffer) == 0)
                         {
@@ -183,24 +186,46 @@ int main(int argc, char const *argv[])
                             }
                         }
 
-                        if(strcmp("Usuario\n",buffer) == 0)
+
+
+                        if(strncmp("USUARIO ",buffer,8) == 0)
                         {
-                            string usuario;
+                            char usuarioAux[50];
+                            string password,user=buffer;
+                            user.copy(usuarioAux,50,8);
+			    string usuario=usuarioAux;
                             busca = localizaJugador(i,Jugadores);
-                            if(Jugadores[busca].getEstado() == 0)
+                            if(Jugadores[busca].getEstado() == SIN_REGISTRAR)
                             {
                                 //Comprobamos que sea correcto el usuario o lo dejamos a libre eleccion????
-                                if(Jugadores[busca].getNombre() != NULL)
-                                    send(Jugadores[busca].getSocket(),"Introduzca nombre de usuario por primera vez\n".sizeof("Introduzca nombre de usuario por primera vez\n"),0);
-                                    recv(Jugadores[busca].getSocket,usuario.c_str(),sizeof(usuario),0);
-                                    Jugadores[busca].setNombre(usuario);
-                                else
-                                    send(Jugadores[busca].getSocket(),"Introduzca nombre de usuario\n".sizeof("Introduzca nombre de usuario\n"),0);
-                                    recv(Jugadores[busca].getSocket,usuario.c_str(),sizeof(usuario),0);
-                                    Jugadores[busca].setNombre(usuario);
+                                if(Jugadores[busca].getNombre() != "")
+                                {
+                                    if(Jugadores[busca].getNombre()==nombre){
+                                      send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\nIntroduzca contraseña:",sizeof("+Ok. Usuario correcto\nIntroduzca contraseña:"),0);
+                                      recv(Jugadores[busca].getSocket,password,sizeof(password),0);
+                                      if(strncmp("PASSWORD ",password.c_str(),9)!=0) 
+                                         send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+                                      else
+                                         {    
+                                        if(Jugadores[busca].getPassword()==password )
+                                           send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
+                                        else 
+                                            send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
+                                         }
+                                       }  
+                                    else 
+                                       send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
                             }
                             else
                                 send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
+                             }
+                            } 
+               
+                        if(strncmp("REGISTRO ",buffer,9)==0){
+
+
+
+
                         }
                     }
             		

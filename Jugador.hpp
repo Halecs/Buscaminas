@@ -28,10 +28,12 @@ class Jugador{
      std::string getNombre(){return nombre_;}
      int getEstado(){return estado_;}
      int getPartida(){return partida_;}
+     int getPassword(){return password_;}
      void setPartida(int partida){partida_=partida;}
      void setSocket(int socket){socket_=socket;}
      void setNombre(std::string nombre){nombre_=nombre;}
      void setEstado(int estado){estado_=estado;}
+     void setPassword(std::string password){password_=password;}
      
      bool operator==(Jugador j){
                      if(this->nombre_==j.nombre_) return true;

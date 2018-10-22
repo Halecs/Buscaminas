@@ -1,6 +1,7 @@
 #ifndef BUSCAMINAS_HPP
 #define BUSCAMINAS_HPP
 #include <vector>
+#include <string>
 #include <ctime>
 #include <cstdlib>
 
@@ -39,7 +40,7 @@ class Buscaminas{
      }
     int getBanderasJugador(int jugador){return nBanderas_[jugador];}
     void generarPartida();
-    void imprimir();
+    std::string imprimir();
     bool ponerBandera(int i,int j, int jugador);
     int  descubrirCasilla(int i, int j);
 

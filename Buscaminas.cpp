@@ -1,6 +1,7 @@
 #include "Buscaminas.hpp"
 #include <vector>
 #include <cstdlib>
+#include <string>
 #include <iostream>
 
 /* Inicializa todo*/
@@ -63,29 +64,30 @@ void Buscaminas::generarNumeros(){
 
 }
 
-void Buscaminas::imprimir()
+std::string Buscaminas::imprimir()
 {
 
-  // ¿Imprimir mina?
+  std::string impreso; 
   for (int i = 0; i < buscaminas_.size(); ++i)
   {
-    std::cout<<"\n";
+    impreso+="\n";
     for (int j = 0; j < buscaminas_.size(); ++j)
     {
       if(buscaminas_[i][j].descubierto)
-        std::cout<<buscaminas_[i][j].minasAlrededor<<" ";
+       impreso+=buscaminas_[i][j].minasAlrededor;impreso+=" ";
       else
       	if(buscaminas_[i][j].bandera == 0)
-        	std::cout<<"- ";
+        	impreso+="- ";
         else
         	if(buscaminas_[i][j].bandera == 1)
-        		std::cout<<"A ";
+        		impreso+="A ";
         	else if(buscaminas_[i][j].bandera == 2)
-        		std::cout<<"B ";
+        		impreso+="B ";
         		else if(buscaminas_[i][j].bandera == 3)
-        			std::cout<<"AB ";
+        			impreso+="AB ";
     }
   }
+  return impreso;
 }
 
 
