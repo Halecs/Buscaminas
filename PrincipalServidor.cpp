@@ -193,18 +193,19 @@ int main(int argc, char const *argv[])
                             char usuarioAux[50];
                             string user=buffer;
                             user.copy(usuarioAux,50,8);
-			    string usuario=usuarioAux;
+			                string usuario=usuarioAux;
                             busca = localizaJugador(i,Jugadores);
                             if(Jugadores[busca].getEstado() == REGISTRADO_SIN_CONECTAR)
                             {
 
                                 if(Jugadores[busca].getNombre().length() != 0)
                                 {
-                                    if(Jugadores[busca].getNombre()==nombre){
+                                    if(Jugadores[busca].getNombre()==nombre)
+                                    {
                                       send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
                                       Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
-                                     }
-                                 else
+                                    }
+                                    else
                                       send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
                                 }
                                else 
@@ -212,31 +213,32 @@ int main(int argc, char const *argv[])
                             } 
                             else 
                                send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0);
-               
                         }
 
                         if(strncmp("PASSWORD ",password.c_str(),8)==0){
                               char passwordAux[50];
                               string pass=buffer;
                               pass.copy(passwordAux,50,9);
-			      string password=usuarioAux;
+			                  string password=usuarioAux;
                               busca = localizaJugador(i,Jugadores);
-                             if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
-                              {
-                                 if(Jugadores[busca].getNombre().length() != 0){
-                                       if(Jugadores[busca].getPassword()==password ){
-                                           send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
-                                           Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);   
-                                            }
-                                        else 
-                                            send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
-                                         }
+                            if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
+                            {
+                                if(Jugadores[busca].getNombre().length() != 0)
+                                {
+                                    if(Jugadores[busca].getPassword()==password )
+                                    {
+                                       send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
+                                       Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);   
+                                    }
                                     else 
-                                       send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
-                                   }
-                                 else 
+                                        send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
+                                }
+                                else 
                                    send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
-                             }
+                            }
+                            else 
+                               send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
+                        }
                          
                         if(strncmp("REGISTRO ",buffer,9)==0){
                             string aux=buffer; 
@@ -244,22 +246,23 @@ int main(int argc, char const *argv[])
                             size_t foundPass=aux.find("-p ");
                             if((foundName==string::npos)||(foundPass==string::npos))
                                 send(Jugadores[busca].getSocket(),mensajeError.c_str().sizeof(mensajeError),0); 
-                            else{
-                                if(foundName<foundPass){
-                                  char nom[50],pass[50];
-                                  string nombre,password;
-                                  int namesize=foundPass-foundName-3);
-                                  aux.copy(nom,namesize,foundName+3);
-                                  aux.copy(pass,50,foundPass+3)
-                                  nombre=nom; password=pass;
-                                  if(ExisteJugador(Jugadores,nombre))
-                                     send(Jugadores[busca].getSocket(),"Nombre ya usado\n",sizeof("Nombre ya usado\n"),0);  
-                                  else{
+                            else
+                            {
+                                if(foundName<foundPass)
+                                {
+                                    char nom[50],pass[50];
+                                    string nombre,password;
+                                    int namesize=(foundPass-foundName-3);
+                                    aux.copy(nom,namesize,foundName+3);
+                                    aux.copy(pass,50,foundPass+3)
+                                    nombre=nom; password=pass;
+                                    if(ExisteJugador(Jugadores,nombre))
+                                        send(Jugadores[busca].getSocket(),"Nombre ya usado\n",sizeof("Nombre ya usado\n"),0);  
+                                    else{
                                     
-                                   }                                 
-                                  }
-                             }    
-
+                                    }                                 
+                                }
+                            }    
                         }
                     }
             		
