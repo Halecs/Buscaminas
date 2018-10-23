@@ -208,9 +208,13 @@ int main(int argc, char const *argv[])
                                     int pos=localizaJugador(usuario,Jugadores);
                                     if( pos!=-1)
                                     {
-                                      Jugadores[busca].setAux(pos);
-                                      send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
-                                      Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
+			              if(Jugadores[pos].getEstado()==DESCONECTADO ){
+                                         Jugadores[busca].setAux(pos);
+                                         send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
+                                         Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
+				      }
+				      else
+                                      send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
                                     }
                                     else
                                       send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
