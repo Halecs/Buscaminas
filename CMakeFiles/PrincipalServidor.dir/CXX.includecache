@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/Halecs/Desktop/Buscaminas/Buscaminas/Buscaminas.cpp
+Buscaminas.hpp
+/mnt/c/Users/Halecs/Desktop/Buscaminas/Buscaminas/Buscaminas.hpp
+vector
+-
+cstdlib
+-
+string
+-
+iostream
+-
+
+/mnt/c/Users/Halecs/Desktop/Buscaminas/Buscaminas/Buscaminas.hpp
+vector
+-
+string
+-
+ctime
+-
+cstdlib
+-
+

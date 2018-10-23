@@ -4,10 +4,12 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include <iostream>
 
 int main(){
   int sd;
@@ -20,7 +22,7 @@ int main(){
   sd = socket (AF_INET, SOCK_STREAM, 0);
 	if (sd == -1)
 	{
-		perror("No se puede abrir el socket cliente\n");
+		std::cout<<"No se puede abrir el socket cliente\n";
     		exit (1);	
 	}
 
@@ -33,7 +35,7 @@ int main(){
 	
 	if (connect(sd, (struct sockaddr *)&sockname, len_sockname) == -1)
 	{
-		perror ("Error de conexión");
+		std::cout<<"Error de conexión";
 		exit(1);
 	}
     FD_ZERO(&auxfds);
@@ -54,7 +56,7 @@ int main(){
         {
         	bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-            printf("\n%s\n",buffer);
+            std::cout<<"\nbuffer\n";
             
         }
         else

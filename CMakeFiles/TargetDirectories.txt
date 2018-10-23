@@ -1,0 +1,2 @@
+/mnt/c/Users/Halecs/Desktop/Buscaminas/Buscaminas/CMakeFiles/PrincipalCliente.dir
+/mnt/c/Users/Halecs/Desktop/Buscaminas/Buscaminas/CMakeFiles/PrincipalServidor.dir

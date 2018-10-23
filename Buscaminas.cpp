@@ -74,7 +74,9 @@ std::string Buscaminas::imprimir()
     for (int j = 0; j < buscaminas_.size(); ++j)
     {
       if(buscaminas_[i][j].descubierto)
-       impreso+=buscaminas_[i][j].minasAlrededor;impreso+=" ";
+      {
+        impreso+=buscaminas_[i][j].minasAlrededor;impreso+=" ";
+      }
       else
       	if(buscaminas_[i][j].bandera == 0)
         	impreso+="- ";
