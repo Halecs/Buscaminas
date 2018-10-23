@@ -88,7 +88,7 @@ int main(int argc, char const *argv[])
         if(salida > 0)
         {
             for(int i=0; i<FD_SETSIZE; i++){
-
+                std::cout<<"aaa";
         	/* Buscamos el socket que se ha establecido conexion*/
             if(FD_ISSET(i, &auxfds))
             {
@@ -135,15 +135,12 @@ int main(int argc, char const *argv[])
             	else
             	{
             		/*El usuario ha hecho algo*/
-            		/* USUARIO, JUGAR, BUSCAR PARTIDA, LOGIN*/
-            		/* 1º)	LOGIN*/
                     char buffer[50];
                     bzero(buffer,sizeof(buffer));
                     int recibido = recv(i,buffer,sizeof(buffer),0);
+                    std::cout<<"aaaa"<<recibido;
                     if(recibido > 0)
                     {
-
-
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strcmp("Salir\n", buffer) == 0)
                         {

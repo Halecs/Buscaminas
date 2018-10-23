@@ -57,7 +57,8 @@ int main(){
         	bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
             std::cout<<buffer;
-            
+            if(strcmp(buffer,"Desconexion servidor\n") == 0)
+                fin =1;
         }
         else
         {
@@ -68,6 +69,8 @@ int main(){
                 fgets(buffer,sizeof(buffer),stdin);
                 if(strcmp(buffer,"SALIR\n") == 0)
                 	fin == 1;
+                
+                send(sd,buffer,sizeof(buffer),0);
 
             }
 
