@@ -148,7 +148,6 @@ int main(int argc, char const *argv[])
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strncmp("Salir", buffer,5) == 0)
                         {
-                            cout<<"he entrado en salir"<<endl;
                             busca = localizaJugador(i,Jugadores);
                             if(Jugadores[busca].getEstado() != 3 && Jugadores[busca].getEstado() != 4)
                                 salirCliente(i,&readfds,Jugadores);
@@ -160,7 +159,7 @@ int main(int argc, char const *argv[])
                                     for (int l = 0; l < Cola.size(); ++l)
                                     {
                                         if(Cola[l].getSocket() == Jugadores[busca].getSocket())
-                                            Cola.erase(Cola.begin() + (l)-1); //???
+                                            Cola.erase(Cola.begin() + l-1); //???
                                         Jugadores[busca].setEstado(DESCONECTADO);
                                     }
                                 }
@@ -197,73 +196,78 @@ int main(int argc, char const *argv[])
                             char usuarioAux[250];
                             string user=buffer;
                             user.copy(usuarioAux,250,8);
-			    string usuario=usuarioAux;
+			                string usuario=usuarioAux;
                             busca = localizaJugador(i,Jugadores);
-                            cout<<"El nombre de usuario="<<usuario<<endl;
                             if(Jugadores[busca].getEstado() == SIN_REGISTRAR)
                             {
-
+                                //Si la cadena del nombre esta vacia
                                 if(Jugadores[busca].getNombre().length() == 0)
                                 {
                                     int pos=localizaJugador(usuario,Jugadores);
-                                    if( pos!=-1)
+                                    if( pos!=-1)    //Si se encuentra a un usuario con ese nombre en el vector
                                     {
-			              if(Jugadores[pos].getEstado()==DESCONECTADO ){
-                                         Jugadores[busca].setAux(pos);
-                                         send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
-                                         Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
-				      }
-				      else
-                                      send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
+			                            if(Jugadores[pos].getEstado()==DESCONECTADO )    //Se comprueba que esta OFF el usuario que hemos encontrado
+                                        {
+                                            Jugadores[busca].setAux(pos);               //Se guarda en el usuario actual la posicion en el vector del usuario igual encontrado
+                                            send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
+                                            Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
+				                        }
+				                        else
+                                            send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
                                     }
                                     else
                                       send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
                                 }
                                else 
-                                   send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
+                                   send(Jugadores[busca].getSocket(),"Este jugador ya tiene un nombre de usuario asignado\n",sizeof("Este jugador ya tiene un nombre de usuario asignado\n"),0);
                             } 
                             else{
                                std::cout<<"El usuario "<<busca<<" esta ya dentro o no esta registrado"<<endl;
-                               send(Jugadores[busca].getSocket(),"adios\n",sizeof("adios\n"),0);}
+                               send(Jugadores[busca].getSocket(),"Accion invalida, ya esta logeado o no está registrado\n",sizeof("Accion invalida, ya esta logeado o no está registrado\n"),0);}
                         }
 
-                        if(strncmp("PASSWORD ",buffer,8)==0){
-                              char passwordAux[250];
-                              string pass=buffer;
-                              pass.copy(passwordAux,250,9);
-			      string password=passwordAux;
-                              busca = localizaJugador(i,Jugadores);
+                        if(strncmp("PASSWORD ",buffer,8)==0)
+                        {
+                            char passwordAux[250];
+                            string pass=buffer;
+                            pass.copy(passwordAux,250,9);
+			                string password=passwordAux;
+                            busca = localizaJugador(i,Jugadores);
                             if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
                             {
-                                if(Jugadores[busca].getNombre().length() == 0)
+                                if(Jugadores[busca].getPassword().length() == 0)
                                 {
-                               
+                                    //Comprobamos que la contraseña es la misma que hay en el jugador con el que se ha encontrado coincidencia
                                     if(Jugadores[Jugadores[busca].getAux()].getPassword()==password )
                                     {
-                                       int r=Jugadores[busca].getAux();
+                                       int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
                                        send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
                                        Jugadores[r].setSocket(Jugadores[busca].getSocket());
                                        Jugadores.erase(Jugadores.begin()+busca-1);
                                        Jugadores[r].setEstado(REGISTRADO_SIN_PARTIDA);   
                                     }
                                     else 
-                                        send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0); 
+                                        send(Jugadores[busca].getSocket(),"Password incorrecta",sizeof("Password incorrecta"),0); 
                                 }
                                 else 
                                    send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0); 
                             }
                             else 
-                               send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0); 
+                               send(Jugadores[busca].getSocket(),"Accion invalida, ya estas logeado\n",sizeof("Accion invalida, ya estas logeado\n"),0); 
                         }
                          
-                        if(strncmp("REGISTRO ",buffer,9)==0){
+                        if(strncmp("REGISTRO ",buffer,9)==0)
+                        {
+                            busca = localizaJugador(i,Jugadores);
                             string aux=buffer; 
                             size_t foundName=aux.find("-u ");
                             size_t foundPass=aux.find("-p ");
+                            //Comprobamos que hemos encontrado -u y -p en el mensaje del cliente
                             if((foundName==string::npos)||(foundPass==string::npos))
-                                send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0); 
+                                send(Jugadores[busca].getSocket(),"Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n",sizeof("Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n"),0); 
                             else
                             {
+                                //Comprobamos que -u está antes que -p en el mensaje del cliente
                                 if(foundName<foundPass)
                                 {
                                     char nom[250],pass[250];
@@ -272,10 +276,15 @@ int main(int argc, char const *argv[])
                                     aux.copy(nom,namesize,foundName+3);
                                     aux.copy(pass,250,foundPass+3);
                                     nombre=nom; password=pass;
+                                    //Comprobamos si hay un jugador con ese mismo nombre de usuario en el vector de jugadores
                                     if(ExisteJugador(Jugadores,nombre))
-                                        send(Jugadores[busca].getSocket(),"Nombre ya usado\n",sizeof("Nombre ya usado\n"),0);  
-                                    else{
-                                    
+                                        send(Jugadores[busca].getSocket(),"Nombre no disponible, ya en uso\n",sizeof("Nombre no disponible,ya en uso\n"),0);  
+                                    else
+                                    {
+                                        Jugadores[busca].setNombre(nombre);
+                                        Jugadores[busca].setPassword(nombre);
+                                        Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);
+                                        send(Jugadores[busca].getSocket(),"Jugador registrado correctamente\n",sizeof("Jugador registrado correctamente\n"),0);  
                                     }                                 
                                 }
                             }    
@@ -323,7 +332,7 @@ void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v)
 {
 
     char buffer[250];
-    send(socket,"Adios,xd\n",sizeof("Adios,xd\n"),0);  
+    send(socket,"\n",sizeof("Adios,xd\n"),0);  
     close(socket);
     FD_CLR(socket,readfds);
     int aux;
