@@ -1,1 +1,0 @@
-/usr/bin/c++   -lrt -g    CMakeFiles/PrincipalServidor.dir/PrincipalServidor.cpp.o CMakeFiles/PrincipalServidor.dir/Partida.cpp.o CMakeFiles/PrincipalServidor.dir/Buscaminas.cpp.o  -o PrincipalServidor -rdynamic 

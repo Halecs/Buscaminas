@@ -1,1 +1,0 @@
-/usr/bin/c++   -lrt -g    CMakeFiles/PrincipalCliente.dir/PrincipalCliente.cpp.o  -o PrincipalCliente -rdynamic 
