@@ -35,7 +35,7 @@ int main(){
 	
 	if (connect(sd, (struct sockaddr *)&sockname, len_sockname) == -1)
 	{
-		std::cout<<"Error de conexión";
+		std::cout<<"Error de conexión\n";
 		exit(1);
 	}
     FD_ZERO(&auxfds);
@@ -56,7 +56,7 @@ int main(){
         {
         	bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-            std::cout<<"\nbuffer\n";
+            std::cout<<buffer;
             
         }
         else
