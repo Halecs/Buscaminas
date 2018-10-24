@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
     //Necesitamos un vector de cola de emparejamiento
     std::vector<Jugador> Cola;
 
-	string mensajeError = "Error no se puede realizar la accion";
+	string mensajeError = "-Err. No se puede realizar la accion\n";
     string mensajeDesconexionPartida = "Un jugador se ha desconectado de la partida";
     string mensajeDesconexionPartida2 = "Te has desconectado de la partida";
 	/* Abrimos socket*/
@@ -104,11 +104,10 @@ int main(int argc, char const *argv[])
                     	Jugador aux;
                     	aux.setSocket(new_sd);
                     	aux.setEstado(0);
-                    	string mensaje = "+ OK\n";
+                    	string mensaje = "+Ok. Conectado al servidor\n";
                     	send(aux.getSocket(),mensaje.c_str(),mensaje.size(),0);
                         Jugadores.push_back(aux);
- 			FD_SET(new_sd,&readfds);
-
+ 			            FD_SET(new_sd,&readfds);
                     }
 
             	}
@@ -123,7 +122,7 @@ int main(int argc, char const *argv[])
             		{
             			for (int i = 0; i < Jugadores.size(); ++i)
             			{
-            				send(Jugadores[i].getSocket(), "Desconexion servidor\n", sizeof("Desconexion servidor\n"),0);
+            				send(Jugadores[i].getSocket(), "+Ok. Desconexion servidor\n", sizeof("+Ok. Desconexion servidor\n"),0);
                             close(Jugadores[i].getSocket());
                             FD_CLR(Jugadores[i].getSocket(),&readfds);
             			}
@@ -170,16 +169,16 @@ int main(int argc, char const *argv[])
                                     int elotro = Partidas[partida].encontrarJugadorOponente(Jugadores[busca].getSocket()); //Buscamos el socket del otro jugador de la partida
                                     if(elotro == 0) // El jugador 1 es el que se va a salir
                                     {
-                                        send(Jugadores[busca].getSocket(),mensajeDesconexionPartida2.c_str(),sizeof(mensajeDesconexionPartida2),0);
-                                        send(Partidas[partida].socketJugador1(),mensajeDesconexionPartida.c_str(),sizeof(mensajeDesconexionPartida),0);
+                                        send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
+                                        send(Partidas[partida].socketJugador1(),"-Err. Un jugador se ha desconectado de la partida\n",sizeof("-Err. Un jugador se ha desconectado de la partida\n"),0);
                                         Jugadores[busca].setEstado(DESCONECTADO);
                                         Jugadores[localizaJugador(Partidas[partida].Jugador1().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                             
                                     }
                                     else
                                     {
-                                        send(Jugadores[busca].getSocket(),mensajeDesconexionPartida2.c_str(),sizeof(mensajeDesconexionPartida2),0);
-                                        send(Partidas[partida].socketJugador2(),mensajeDesconexionPartida.c_str(),sizeof(mensajeDesconexionPartida),0);
+                                        send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
+                                        send(Partidas[partida].socketJugador2(),"-Err. Un jugador se ha desconectado de la partida\n",sizeof("-Err. Un jugador se ha desconectado de la partida\n"),0);
                                         Jugadores[busca].setEstado(DESCONECTADO);
                                         Jugadores[localizaJugador(Partidas[partida].Jugador2().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                     }
@@ -213,17 +212,17 @@ int main(int argc, char const *argv[])
                                             Jugadores[busca].setEstado(ESPERANDO_PASSWORD);
 				                        }
 				                        else
-                                            send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
+                                            send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion\n",sizeof("-Err. No se puede realizar la accion\n"),0);
                                     }
                                     else
-                                      send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0);
+                                      send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion\n",sizeof("-Err. No se puede realizar la accion\n"),0);
                                 }
                                else 
-                                   send(Jugadores[busca].getSocket(),"Este jugador ya tiene un nombre de usuario asignado\n",sizeof("Este jugador ya tiene un nombre de usuario asignado\n"),0);
+                                   send(Jugadores[busca].getSocket(),"-Err. Este jugador ya tiene un nombre de usuario asignado\n",sizeof("-Err. Este jugador ya tiene un nombre de usuario asignado\n"),0);
                             } 
                             else{
                                std::cout<<"El usuario "<<busca<<" esta ya dentro o no esta registrado"<<endl;
-                               send(Jugadores[busca].getSocket(),"Accion invalida, ya esta logeado o no está registrado\n",sizeof("Accion invalida, ya esta logeado o no está registrado\n"),0);}
+                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida, ya esta logeado o no está registrado\n",sizeof("-Err. Accion invalida, ya esta logeado o no está registrado\n"),0);}
                         }
 
                         if(strncmp("PASSWORD ",buffer,8)==0)
@@ -241,19 +240,19 @@ int main(int argc, char const *argv[])
                                     if(Jugadores[Jugadores[busca].getAux()].getPassword()==password )
                                     {
                                        int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
-                                       send(Jugadores[busca].getSocket(),"+Ok. Usuario validado",sizeof("+Ok. Usuario validado"),0);
+                                       send(Jugadores[busca].getSocket(),"+Ok. Usuario validado\n",sizeof("+Ok. Usuario validado\n"),0);
                                        Jugadores[r].setSocket(Jugadores[busca].getSocket());
                                        Jugadores.erase(Jugadores.begin()+busca-1);
                                        Jugadores[r].setEstado(REGISTRADO_SIN_PARTIDA);   
                                     }
                                     else 
-                                        send(Jugadores[busca].getSocket(),"Password incorrecta",sizeof("Password incorrecta"),0); 
+                                        send(Jugadores[busca].getSocket(),"-Err. Password incorrecta\n",sizeof("-Err. Password incorrecta\n"),0); 
                                 }
                                 else 
-                                   send(Jugadores[busca].getSocket(),mensajeError.c_str(),mensajeError.length(),0); 
+                                   send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion\n",sizeof("-Err. No se puede realizar la accion\n"),0); 
                             }
                             else 
-                               send(Jugadores[busca].getSocket(),"Accion invalida, ya estas logeado\n",sizeof("Accion invalida, ya estas logeado\n"),0); 
+                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida, ya estas logeado\n",sizeof("-Err. Accion invalida, ya estas logeado\n"),0); 
                         }
                          
                         if(strncmp("REGISTRO ",buffer,9)==0)
@@ -264,7 +263,7 @@ int main(int argc, char const *argv[])
                             size_t foundPass=aux.find("-p ");
                             //Comprobamos que hemos encontrado -u y -p en el mensaje del cliente
                             if((foundName==string::npos)||(foundPass==string::npos))
-                                send(Jugadores[busca].getSocket(),"Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n",sizeof("Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n"),0); 
+                                send(Jugadores[busca].getSocket(),"-Err. Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n",sizeof("-Err. Formato incorrecto, recuerde que es:REGISTRO -u <usuario> -p <contraseña>\n"),0); 
                             else
                             {
                                 //Comprobamos que -u está antes que -p en el mensaje del cliente
@@ -278,13 +277,13 @@ int main(int argc, char const *argv[])
                                     nombre=nom; password=pass;
                                     //Comprobamos si hay un jugador con ese mismo nombre de usuario en el vector de jugadores
                                     if(ExisteJugador(Jugadores,nombre))
-                                        send(Jugadores[busca].getSocket(),"Nombre no disponible, ya en uso\n",sizeof("Nombre no disponible,ya en uso\n"),0);  
+                                        send(Jugadores[busca].getSocket(),"-Err. Nombre no disponible, ya en uso\n",sizeof("-Err. Nombre no disponible,ya en uso\n"),0);  
                                     else
                                     {
                                         Jugadores[busca].setNombre(nombre);
                                         Jugadores[busca].setPassword(nombre);
                                         Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);
-                                        send(Jugadores[busca].getSocket(),"Jugador registrado correctamente\n",sizeof("Jugador registrado correctamente\n"),0);  
+                                        send(Jugadores[busca].getSocket(),"+Ok. Jugador registrado correctamente\n",sizeof("+Ok. Jugador registrado correctamente\n"),0);  
                                     }                                 
                                 }
                             }    
