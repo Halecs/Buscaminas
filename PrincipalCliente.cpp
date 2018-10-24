@@ -56,12 +56,13 @@ int main(){
         {
         	bzero(buffer,sizeof(buffer));
             recv(sd,buffer,sizeof(buffer),0);
-            std::cout<<buffer;
-            if(strcmp(buffer,"Desconexion servidor\n") == 0)	//Si el servidor se va a desconectar
+            if(strcmp(buffer,"+Ok. Desconexion servidor\n") == 0)	//Si el servidor se va a desconectar
             {
                 fin =1;
-                std::cout<<"Desconectada del servidor correctamente"<<std::endl;
+                std::cout<<"Desconectado del servidor correctamente"<<std::endl;
             }
+            else
+            	std::cout<<buffer;
         }
         else
         {
@@ -71,11 +72,11 @@ int main(){
                 bzero(buffer,sizeof(buffer));
                 fgets(buffer,sizeof(buffer),stdin);
                 send(sd,buffer,sizeof(buffer),0);
-                if(strcmp(buffer,"Salir\n") == 0)	//Si el cliente pide la desconexión
+                /*if(strcmp(buffer,"Salir\n") == 0)	//Si el cliente pide la desconexión
                 {
                 	fin = 1;
                 	std::cout<<"Desconectada del servidor correctamente"<<std::endl;
-                }	
+                }	*/
             }
 
         }//SALIR DEL SERVIDOR

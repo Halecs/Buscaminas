@@ -34,7 +34,7 @@ class Partida{
     bool esTurno(Jugador j){if(jugadores_[turno_]==j) return true;return false;}
 
     bool existeJugador(Jugador j){ if((jugadores_[0]==j)||(jugadores_[1]==j)) return true; return false;}
-
+    
     
     
 

@@ -1,3 +1,9 @@
 build/
 CMakeFiles/
 Funcionalidad\.txt
+
+*.cmake
+
+CMakeCache\.txt
+
+Makefile
