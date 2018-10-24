@@ -41,7 +41,16 @@ class Jugador{
                      if(this->nombre_==j.nombre_) return true;
                      else return false;
        }
-    
+    /*inline Jugador & operator=(Jugador const  &j)
+    {
+      setSocket(j.getSocket());
+      setNombre(j.getNombre());
+      setPassword(j.getPassword());
+      setEstado(j.getEstado());
+      setPartida(j.getPartida());
+      setAux(j.getAux());
+      return *this;
+    }*/
 
 
 };
