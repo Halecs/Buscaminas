@@ -318,10 +318,10 @@ int main(int argc, char const *argv[])
                                     Partida nueva(Jugadores[jugador1],Jugadores[jugador2]);
                                 }
                                 else    //Si no hay gente en cola para partida
-                                    send(Jugadores[busca].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
+                                    send(Jugadores[jugador2].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
                             }
                             else
-                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
+                               send(Jugadores[jugador2].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
                         }
 
                         /*if(Jugadores[busca].getEstado() == REGISTRADO_JUGANDO)
