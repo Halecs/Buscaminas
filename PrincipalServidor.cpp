@@ -315,14 +315,24 @@ int main(int argc, char const *argv[])
                                     //Partida nueva = new Partida(Jugadores[jugador1],Jugadores[jugador2]); //Falta operadores?
                                     //Buscaminas tablero = new Buscaminas(); //Falta operadores, no se si esto hace falta
                                     //Partida.setTablero(tablero); //?????
+                                    Partida nueva(Jugadores[jugador1],Jugadores[jugador2]);
                                 }
                                 else    //Si no hay gente en cola para partida
                                     send(Jugadores[busca].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
                             }
                             else
                                send(Jugadores[busca].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
-
                         }
+
+                        /*if(Jugadores[busca].getEstado() == REGISTRADO_JUGANDO)
+                        {
+                            std::cout<<"He entrado"<<endl;
+                            int busca = localizaJugador(i,Jugadores);
+                            int related = buscarJugadorPartida(Jugadores[busca],Partidas);
+                            int other = Partidas[related].encontrarJugadorOponente(Jugadores[busca].getSocket());
+                            send(Jugadores[busca].getSocket(),Partidas[related].getTablero().imprimir().c_str(),sizeof(Partidas[related].getTablero().imprimir().c_str()),0);
+                            send(Jugadores[other].getSocket(),Partidas[related].getTablero().imprimir().c_str(),sizeof(Partidas[related].getTablero().imprimir().c_str()),0);
+                        }*/
                     }
             		
             	}

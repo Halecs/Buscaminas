@@ -17,7 +17,7 @@ class Partida{
 
     int socketJugador1(){return jugadores_[0].getSocket();}
     int socketJugador2(){return jugadores_[1].getSocket();}
-
+    Buscaminas getTablero(){return busc_;}
     Jugador Jugador1(){return jugadores_[0];}
     Jugador Jugador2(){return jugadores_[1];}
 
@@ -34,7 +34,7 @@ class Partida{
     bool esTurno(Jugador j){if(jugadores_[turno_]==j) return true;return false;}
 
     bool existeJugador(Jugador j){ if((jugadores_[0]==j)||(jugadores_[1]==j)) return true; return false;}
-    
+
     
     
 
