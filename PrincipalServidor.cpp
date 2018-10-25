@@ -312,10 +312,16 @@ int main(int argc, char const *argv[])
                                     Cola.clear();
                                     if(Cola.size() != 0)
                                         std::cout<<"Error borrando vector Cola, tamaño: "<<Cola.size()<<std::endl;
-                                    //Partida nueva = new Partida(Jugadores[jugador1],Jugadores[jugador2]); //Falta operadores?
-                                    //Buscaminas tablero = new Buscaminas(); //Falta operadores, no se si esto hace falta
-                                    //Partida.setTablero(tablero); //?????
                                     Partida nueva(Jugadores[jugador1],Jugadores[jugador2]);
+                                    Partidas.push_back(nueva);
+                                    Partidas[Partidas.size() - 1].getTablero().generarPartida();
+                                    std::cout<<Partidas[Partidas.size() - 1].getTablero().imprimir()<<std::endl; 
+                                    char xd[255];
+                                    strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
+                                    send(Jugadores[jugador1].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
+                                    send(Jugadores[jugador1].getSocket(),xd,sizeof(xd),0);
+                                    send(Jugadores[jugador2].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
+                                    send(Jugadores[jugador2].getSocket(),xd,sizeof(xd),0);
                                 }
                                 else    //Si no hay gente en cola para partida
                                     send(Jugadores[jugador2].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  

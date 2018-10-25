@@ -40,7 +40,7 @@ class Buscaminas{
      }
     int getBanderasJugador(int jugador){return nBanderas_[jugador];}
     void generarPartida();
-    std::string imprimir();
+    char* imprimir();
     bool ponerBandera(int i,int j, int jugador);
     int  descubrirCasilla(int i, int j);
 

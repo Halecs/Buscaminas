@@ -44,7 +44,7 @@ int main(){
     FD_SET(0,&readfds);
     FD_SET(sd,&readfds);
 
-    char buffer[250];
+    char buffer[255];
     
     do
     {
