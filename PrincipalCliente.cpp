@@ -61,11 +61,16 @@ int main(){
                 fin =1;
                 std::cout<<"Desconectado del servidor correctamente"<<std::endl;
             }
-            else{
-                if(buffer[249]){recv(sd,aux,sizeof(aux),0);
-                        std::cout<<buffer<<aux<<std::endl;}
-            	else std::cout<<buffer;
+            else
+            {
+                if(buffer[249])
+                {
+                    std::cout<<"holaxd";
+                    recv(sd,aux,sizeof(aux),0);
+                    std::cout<<buffer<<aux<<std::endl;
                 }
+            	else std::cout<<buffer;
+            }
 
         }
         else
@@ -76,11 +81,6 @@ int main(){
                 bzero(buffer,sizeof(buffer));
                 fgets(buffer,sizeof(buffer),stdin);
                 send(sd,buffer,sizeof(buffer),0);
-                /*if(strcmp(buffer,"Salir\n") == 0)	//Si el cliente pide la desconexión
-                {
-                	fin = 1;
-                	std::cout<<"Desconectada del servidor correctamente"<<std::endl;
-                }	*/
             }
 
         }//SALIR DEL SERVIDOR

@@ -2,12 +2,12 @@
 #define JUGADOR_HPP
 #include <cassert>
 #include <string>
-const int SIN_REGISTRAR=0;
-const int ESPERANDO_PASSWORD=1;
-const int REGISTRADO_SIN_PARTIDA=2;
-const int REGISTRADO_BUSCANDO_PARTIDA=3;
-const int REGISTRADO_JUGANDO=4;
-const int DESCONECTADO=5;
+#define SIN_REGISTRAR 0
+#define ESPERANDO_PASSWORD 1
+#define REGISTRADO_SIN_PARTIDA 2
+#define REGISTRADO_BUSCANDO_PARTIDA 3 
+#define REGISTRADO_JUGANDO 4
+#define DESCONECTADO 5
 /*Estados del jugador
    0->Conectado sin registrar
    1->Esperando contraseña
@@ -41,18 +41,6 @@ class Jugador{
                      if(this->nombre_==j.nombre_) return true;
                      else return false;
        }
-    /*inline Jugador & operator=(Jugador const  &j)
-    {
-      setSocket(j.getSocket());
-      setNombre(j.getNombre());
-      setPassword(j.getPassword());
-      setEstado(j.getEstado());
-      setPartida(j.getPartida());
-      setAux(j.getAux());
-      return *this;
-    }*/
-
-
 };
 
 #endif

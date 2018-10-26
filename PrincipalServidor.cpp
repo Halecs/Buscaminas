@@ -6,13 +6,14 @@
 #include <cstdlib>
 #include <string>
 #include <cstring>
-#include<signal.h>
+#include <signal.h>
 #include <unistd.h>
 #include <ctime>
 #include <arpa/inet.h>
 #include <vector>
 #include <regex>
 #include <iostream>
+#include <fstream>
 
 #include "Jugador.hpp"
 #include "Partida.hpp"
@@ -26,6 +27,9 @@ int localizaJugador(int socket, std::vector<Jugador> v);
 bool ExisteJugador(std::vector<Jugador> v, string j);
 int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas);
 int localizaJugador(string nombre, std::vector<Jugador> v);
+void escribirfichero(string nombrefich, std::vector<Jugador> v);
+
+
 
 int main(int argc, char const *argv[])
 {
@@ -34,7 +38,8 @@ int main(int argc, char const *argv[])
 	fd_set readfds, auxfds;
     socklen_t from_len;
 	int salida,on,ret, busca;
-
+    string nombrefich="jugadores.txt";
+    //string s,d,f;
 	std::vector<Jugador> Jugadores;
 	std::vector<Partida> Partidas;
     //Necesitamos un vector de cola de emparejamiento
@@ -79,6 +84,31 @@ int main(int argc, char const *argv[])
     FD_ZERO(&auxfds);
     FD_SET(sd,&readfds);
     FD_SET(0,&readfds);
+
+    //Aqui vamos a leer desde el fichero
+
+    string s,d,f;
+    ifstream fich(nombrefich.c_str());
+    Jugador aux;
+    if(fich.is_open())
+    {
+        getline(fich,s,' ');
+        getline(fich,d,'\n');
+        while(!fich.eof())
+        {
+            if(s.length() != 0 and s.length() != 0)
+            {
+                aux.setNombre(s);
+                aux.setPassword(d);
+                Jugadores.push_back(aux);
+            }
+            getline(fich,s,' ');
+            getline(fich,d,'\n');
+        }
+        fich.close();
+    }
+    else
+        std::cout<<"No hay registro de jugadores\n";
 
     while(1)
     {
@@ -126,6 +156,7 @@ int main(int argc, char const *argv[])
                             close(Jugadores[i].getSocket());
                             FD_CLR(Jugadores[i].getSocket(),&readfds);
             			}
+                        escribirfichero(nombrefich,Jugadores);
             			close(sd);
             			exit(-1);
             		}
@@ -147,9 +178,13 @@ int main(int argc, char const *argv[])
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strncmp("Salir", buffer,5) == 0)
                         {
+                            std::cout<<"ha entrado\n";
                             busca = localizaJugador(i,Jugadores);
                             if(Jugadores[busca].getEstado() != 3 && Jugadores[busca].getEstado() != 4)
+                            {
                                 salirCliente(i,&readfds,Jugadores);
+                                Jugadores[busca].setEstado(5); 
+                            }
                             else // Si estan en partida o buscando
                             {
                                 //Registrado buscando partida
@@ -160,6 +195,7 @@ int main(int argc, char const *argv[])
                                         if(Cola[l].getSocket() == Jugadores[busca].getSocket())
                                             Cola.erase(Cola.begin() + l-1); //???
                                         salirCliente(i,&readfds,Jugadores);
+                                        Jugadores[busca].setEstado(5); 
                                     }
                                 }
                                 //En partida
@@ -172,6 +208,7 @@ int main(int argc, char const *argv[])
                                         send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
                                         send(Partidas[partida].socketJugador1(),"-Err. Un jugador se ha desconectado de la partida\n",sizeof("-Err. Un jugador se ha desconectado de la partida\n"),0);
                                         salirCliente(i,&readfds,Jugadores);
+                                        Jugadores[busca].setEstado(5); 
                                         Jugadores[localizaJugador(Partidas[partida].Jugador1().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                             
                                     }
@@ -180,6 +217,7 @@ int main(int argc, char const *argv[])
                                         send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
                                         send(Partidas[partida].socketJugador2(),"-Err. Un jugador se ha desconectado de la partida\n",sizeof("-Err. Un jugador se ha desconectado de la partida\n"),0);
                                         salirCliente(i,&readfds,Jugadores);
+                                        Jugadores[busca].setEstado(5); 
                                         Jugadores[localizaJugador(Partidas[partida].Jugador2().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                     }
                                     //Volver a poner en cola quizas mas adelante
@@ -337,16 +375,6 @@ int main(int argc, char const *argv[])
                             else
                                send(Jugadores[jugador2].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
                         }
-
-                        /*if(Jugadores[busca].getEstado() == REGISTRADO_JUGANDO)
-                        {
-                            std::cout<<"He entrado"<<endl;
-                            int busca = localizaJugador(i,Jugadores);
-                            int related = buscarJugadorPartida(Jugadores[busca],Partidas);
-                            int other = Partidas[related].encontrarJugadorOponente(Jugadores[busca].getSocket());
-                            send(Jugadores[busca].getSocket(),Partidas[related].getTablero().imprimir().c_str(),sizeof(Partidas[related].getTablero().imprimir().c_str()),0);
-                            send(Jugadores[other].getSocket(),Partidas[related].getTablero().imprimir().c_str(),sizeof(Partidas[related].getTablero().imprimir().c_str()),0);
-                        }*/
                     }
             		
             	}
@@ -407,11 +435,8 @@ void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v)
     close(socket);
     FD_CLR(socket,readfds);
     int aux;
-    for (int i = 0; i < v.size(); ++i)
-    {
-        if(socket == v[i].getSocket())
-            v[i].setEstado(DESCONECTADO);
-    }
+    int busca = localizaJugador(socket,v);
+    v[busca].setEstado(5);
 
     
 }
@@ -443,4 +468,22 @@ int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas)
         return i;
   }
   return -1;
+}
+
+void escribirfichero(string nombrefich, std::vector<Jugador> v)
+{
+    fstream fichero;
+    fichero.open(nombrefich.c_str(), ios::out | ios::app);
+    if(fichero.is_open())
+    {
+        for (int i = 0; i < v.size(); ++i)
+        {
+            if(v[i].getNombre().length() != 0)
+                fichero<<v[i].getNombre()<<" "<<v[i].getPassword()<<"\n";
+        }
+        fichero.close();
+    }
+    else
+        std::cout<<"error\n";
+
 }
