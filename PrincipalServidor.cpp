@@ -11,7 +11,7 @@
 #include <ctime>
 #include <arpa/inet.h>
 #include <vector>
-#include <queue>
+#include <regex>
 #include <iostream>
 
 #include "Jugador.hpp"
@@ -273,20 +273,27 @@ int main(int argc, char const *argv[])
                                 //Comprobamos que -u está antes que -p en el mensaje del cliente
                                     if(foundName<foundPass)
                                     {
-                                        char nom[250],pass[250];
-                                        string nombre,password;
-                                        int namesize=(foundPass-foundName-3);
-                                        aux.copy(nom,namesize,foundName+3);
-                                        aux.copy(pass,250,foundPass+3);
-                                        cout<<nom<<" "<<REGISTRADO_SIN_PARTIDA<<",    "<<buffer<<endl;
-                                        nombre=nom; password=pass;
+                                       string nombre,password;
+                                       regex e("(^REGISTRO )(.*)"); 
+                                       aux=regex_replace (aux,e,"$2");
+
+                                       string aux2=aux;
+                                       std::regex u("-u ([a-zA-Z0-9]*)"); 
+                                       aux2=regex_replace(aux2,u,"$1");
+                                       regex x("(^[a-zA-Z0-9]*)( .*)");
+                                       nombre=regex_replace(aux2,x,"$1");
+                                       nombre=nombre.substr(0,nombre.size()-1);
+                                       std::regex v("^[a-zA-Z0-9]* -p ([a-zA-Z0-9]*)"); 
+                                       password=regex_replace(aux2,v,"$1");
+                                       password=password.substr(0,password.size()-1);
+                                       //cout<<"usuario="<<nombre<<",password="<<password<<endl;
                                         //Comprobamos si hay un jugador con ese mismo nombre de usuario en el vector de jugadores
                                         if(ExisteJugador(Jugadores,nombre))
                                             send(Jugadores[busca].getSocket(),"-Err. Nombre no disponible, ya en uso\n",sizeof("-Err. Nombre no disponible,ya en uso\n"),0);  
                                         else
                                         {
                                             Jugadores[busca].setNombre(nombre);
-                                            Jugadores[busca].setPassword(nombre);
+                                            Jugadores[busca].setPassword(password);
                                             Jugadores[busca].setEstado(REGISTRADO_SIN_PARTIDA);
                                             send(Jugadores[busca].getSocket(),"+Ok. Jugador registrado correctamente\n",sizeof("+Ok. Jugador registrado correctamente\n"),0);  
                                         }                                 
@@ -295,7 +302,7 @@ int main(int argc, char const *argv[])
                             }
                             else
                                 send(Jugadores[busca].getSocket(),"-Err. Jugador ya registrado\n",sizeof("-Err. Jugador ya registrado\n"),0);  
-                           //imprimirJugadores(Jugadores);
+                           imprimirJugadores(Jugadores);
                         }
                         if(strncmp("INICIAR PARTIDA",buffer,14)== 0)
                         {
@@ -383,7 +390,7 @@ void imprimirJugadores(std::vector<Jugador> v)
             if(v[i].getNombre().size() == 0)
                 noregistrados++;
             else
-                std::cout<<v[i].getNombre()<<v[i].getPassword()<<v[i].getEstado()<<std::endl;
+                std::cout<<v[i].getNombre()<<" "<<v[i].getPassword()<<" "<<v[i].getEstado()<<std::endl;
         }
         std::cout<<"Hay "<<noregistrados<<" jugadores no registrados en el servidor"<<std::endl;
 
