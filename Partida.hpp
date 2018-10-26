@@ -3,8 +3,8 @@
 
 #include "Buscaminas.hpp"
 #include "Jugador.hpp"
-#define A 0
-#define B 1
+const int A=0;
+const int B=1;
 class Partida{
   private:
     int turno_;

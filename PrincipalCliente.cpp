@@ -45,7 +45,7 @@ int main(){
     FD_SET(sd,&readfds);
 
     char buffer[255];
-    
+    char aux[255];
     do
     {
     	auxfds = readfds;
@@ -61,8 +61,12 @@ int main(){
                 fin =1;
                 std::cout<<"Desconectado del servidor correctamente"<<std::endl;
             }
-            else
-            	std::cout<<buffer;
+            else{
+                if(buffer[249]){recv(sd,aux,sizeof(aux),0);
+                        std::cout<<buffer<<aux<<std::endl;}
+            	else std::cout<<buffer;
+                }
+
         }
         else
         {

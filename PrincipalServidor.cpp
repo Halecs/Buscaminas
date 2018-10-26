@@ -278,6 +278,7 @@ int main(int argc, char const *argv[])
                                         int namesize=(foundPass-foundName-3);
                                         aux.copy(nom,namesize,foundName+3);
                                         aux.copy(pass,250,foundPass+3);
+                                        cout<<nom<<" "<<REGISTRADO_SIN_PARTIDA<<",    "<<buffer<<endl;
                                         nombre=nom; password=pass;
                                         //Comprobamos si hay un jugador con ese mismo nombre de usuario en el vector de jugadores
                                         if(ExisteJugador(Jugadores,nombre))
@@ -294,7 +295,7 @@ int main(int argc, char const *argv[])
                             }
                             else
                                 send(Jugadores[busca].getSocket(),"-Err. Jugador ya registrado\n",sizeof("-Err. Jugador ya registrado\n"),0);  
-
+                           //imprimirJugadores(Jugadores);
                         }
                         if(strncmp("INICIAR PARTIDA",buffer,14)== 0)
                         {
@@ -316,7 +317,7 @@ int main(int argc, char const *argv[])
                                     Partidas.push_back(nueva);
                                     Partidas[Partidas.size() - 1].getTablero().generarPartida();
                                     std::cout<<Partidas[Partidas.size() - 1].getTablero().imprimir()<<std::endl; 
-                                    char xd[255];
+                                    char xd[250];
                                     strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                     send(Jugadores[jugador1].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
                                     send(Jugadores[jugador1].getSocket(),xd,sizeof(xd),0);
@@ -382,7 +383,7 @@ void imprimirJugadores(std::vector<Jugador> v)
             if(v[i].getNombre().size() == 0)
                 noregistrados++;
             else
-                std::cout<<v[i].getNombre()<<v[i].getEstado()<<std::endl;
+                std::cout<<v[i].getNombre()<<v[i].getPassword()<<v[i].getEstado()<<std::endl;
         }
         std::cout<<"Hay "<<noregistrados<<" jugadores no registrados en el servidor"<<std::endl;
 
@@ -402,7 +403,7 @@ void salirCliente(int socket, fd_set * readfds, std::vector<Jugador> v)
     for (int i = 0; i < v.size(); ++i)
     {
         if(socket == v[i].getSocket())
-            v[i].setEstado(5);
+            v[i].setEstado(DESCONECTADO);
     }
 
     
