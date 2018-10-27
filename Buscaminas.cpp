@@ -122,15 +122,16 @@ bool Buscaminas::ponerBandera(int i,int j, int jugador)
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
 int Buscaminas::descubrirCasilla(int i,int j)
 {
+       //std::cout<<i<<","<<j<<std::endl;
 	if(!buscaminas_[i][j].descubierto)
 	{
-		buscaminas_[i][j].descubierto == true;
+		buscaminas_[i][j].descubierto = true;
                 if(buscaminas_[i][j].minasAlrededor==0){
                     for(int k=i-1;k<=i+1;k++){  
   
                       for(int l=j-1;l<=j+1;l++){
                    
-                         if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())){
+                         if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())&&(k!=i)&&(l!=j)){
                                
                               descubrirCasilla(k,l);
                           } 

@@ -21,6 +21,9 @@ class Partida{
     Jugador Jugador1(){return jugadores_[0];}
     Jugador Jugador2(){return jugadores_[1];}
     int getTurno(){return turno_;}
+    void cambiarPartida(int i){jugadores_[0].setPartida(i);jugadores_[1].setPartida(i);}
+    Jugador getJugadorTurno(){return jugadores_[turno_];}
+    Jugador getJugadorNoTurno(){return jugadores_[(turno_+1)%2];}
     int numeroDeJugador(int socket)
     {
         if(jugadores_[0].getSocket() == socket)

@@ -14,7 +14,7 @@
 #include <regex>
 #include <iostream>
 #include <fstream>
-
+#include <pthread.h>
 #include "Jugador.hpp"
 #include "Partida.hpp"
 
@@ -28,8 +28,10 @@ bool ExisteJugador(std::vector<Jugador> v, string j);
 int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas);
 int localizaJugador(string nombre, std::vector<Jugador> v);
 void escribirfichero(string nombrefich, Jugador j);
+void eliminar_partida(std::vector<Partida> &p,int partida);
 
 
+static pthread_mutex_t sem = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char const *argv[])
 {
@@ -354,9 +356,13 @@ int main(int argc, char const *argv[])
                                         std::cout<<"Error borrando vector Cola, tamaño: "<<Cola.size()<<std::endl;
                                     Partida nueva(Jugadores[jugador1],Jugadores[jugador2]);
                                     Partidas.push_back(nueva);
-                                    Partidas[Partidas.size() - 1].getTablero().generarPartida();
-                                    std::cout<<Partidas[Partidas.size() - 1].getTablero().imprimir()<<std::endl; 
-                                    char xd[250];
+                                    int partidaActual=Partidas.size() - 1;
+                                    Jugadores[jugador2].setPartida(partidaActual);
+                                    Jugadores[jugador1].setPartida(partidaActual);      
+                                    Partidas[partidaActual].getTablero().generarPartida();
+                                    
+                                    std::cout<<Partidas[partidaActual].getTablero().imprimir()<<std::endl; 
+                                    char xd[400];
                                     strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                     send(Jugadores[jugador1].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
                                     send(Jugadores[jugador1].getSocket(),xd,sizeof(xd),0);
@@ -370,49 +376,69 @@ int main(int argc, char const *argv[])
                                send(Jugadores[jugador2].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
                         }
 
-                        if(strncmp("DESCUBRIR ",buffer,10)== 0)
+                        if(strncmp("DESCUBRIR ",buffer,9)== 0)
                         {
+                            pthread_mutex_lock (&sem);
                             entra=true;
-                            string pattern="[A-Z]";
-                            std::smatch m;
+                            string pattern="(DESCUBRIR )([A-Z],[1-9]$)";
+                            regex coincidencia2("DESCUBRIR [A-Z],[1-9]$");
                             regex coincidencia(pattern);
                             int jugador = localizaJugador(i,Jugadores);
                             if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
                             {
-                                int partida = buscarJugadorPartida(Jugadores[jugador], Partidas);
-                                if(Partidas[partida].getTurno() == Partidas[partida].numeroDeJugador(i)) //Si es su turno
+                                int partida = Jugadores[jugador].getPartida();
+                                if(Partidas[partida].esTurno(Jugadores[jugador])) //Si es su turno
                                 {
                                     string descubre=buffer;
-                                    string numerocas=descubre.substr(11,string::npos-1); //Se queda solo con el numero y la letra pop_back si no funciona
-                                    string letra  = numerocas.substr(0,1);             //La letra
-                                    string numero = numerocas.substr(1,string::npos); //El numero
+                                    descubre=descubre.substr(0,descubre.size()-1);
+                                    //cout<<descubre<<endl;
+                                    if(!regex_match(descubre,coincidencia2)) send(Jugadores[jugador].getSocket(),"-Err. Mensaje erroneo\n",sizeof("-Err. Mensaje erroneo\n"),0); 
+                                    else{
+                                    string numerocas=regex_replace(descubre,coincidencia,"$2");
+                                    string numero  = numerocas.substr(2);             //La letra
+                                    string letra = numerocas.substr(0,1); //El numero
+                                  
+                                    //cout<<letra<<","<<numero<<endl;
                                     int num = std::stoi(numero);
-                                    if((num >= 0 && num < 10) && (std::regex_search(letra,m,coincidencia))) //Casilla valida
+                                    if((num >= 0 && num < 10)) //Casilla valida
                                     {
                                         if(!Partidas[partida].getTablero().CasillaDescubierta(letra,num))        //Si ya esta descubierta illo pasar de letra a numero joder
                                         {
                                             int status = Partidas[partida].descubrirCasilla(letra,num);
                                             if(status == 1) //Ha perdido
                                             {
-
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
+                                               eliminar_partida(Partidas,partida);
+                                            }
+                                            if(status==0){
+                                               std::cout<<Partidas[partida].getTablero().imprimir()<<std::endl; 
+                                               char xd[400];
+                                               strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),xd,sizeof(xd),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xd,sizeof(xd),0);
                                             }
                                         }
+                                      
                                         else
                                             send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla ya descubierta\n",sizeof("-Err. Accion invalida, casilla ya descubierta\n"),0); 
                                     }
+                                    
                                     else
                                         send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla invalida\n",sizeof("-Err. Accion invalida, casilla invalida\n"),0); 
+                                    }
                                 }
                                 else
                                     send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no es tu turno\n",sizeof("-Err. Accion invalida, no es tu turno\n"),0); 
                             }
                             else
                                send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no estas en partida\n",sizeof("-Err. Accion invalida, no estas en partida\n"),0); 
-
+                          pthread_mutex_unlock (&sem);
+                          
                         }
                         if(strncmp("BANDERA ",buffer,8)== 0)
                         {
-                            entra=true;
+                          
 
                         }
                         if(strncmp("HELP",buffer,4)== 0)
@@ -422,7 +448,7 @@ int main(int argc, char const *argv[])
                         if(entra==false)
                         {
                             busca = localizaJugador(i,Jugadores);
-                            send(Jugadores[busca].getSocket(),"-Err. Comando invalido\n",sizeof("-Err.Comando invalido\n"),0); 
+                            //send(Jugadores[busca].getSocket(),"-Err. Comando invalido\n",sizeof("-Err.Comando invalido\n"),0); 
 
                         }
                     }
@@ -434,6 +460,7 @@ int main(int argc, char const *argv[])
         }
 
     }
+    pthread_mutex_destroy(&sem);
     close(sd);
 	return 0;
 }
@@ -508,6 +535,14 @@ int localizaJugador(string nombre, std::vector<Jugador> v)
             return i;
     }
     return -1;
+}
+
+void eliminar_partida(std::vector<Partida> &p,int partida){ 
+  //  pthread_mutex_lock (&sem);
+    p.erase(p.begin()+partida);
+    for(int i=partida;i<p.size();i++)
+            p[i].cambiarPartida(i);
+  //  pthread_mutex_unlock (&sem);
 }
 
 int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas)
