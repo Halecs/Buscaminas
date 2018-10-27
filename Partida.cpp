@@ -4,7 +4,6 @@
 
 int Partida::descubrirCasilla(std::string letra,int j){
    int i = letraNumero(letra);
-   int resultado= busc_.descubrirCasilla(i,j);
    turno_=(turno_+1)%2;
    int resultado = busc_.descubrirCasilla(i,j);
   if(resultado == 1)
