@@ -145,3 +145,27 @@ int Buscaminas::descubrirCasilla(int i,int j)
 	else
 		return -1;
 }
+
+bool Buscaminas::CasillaDescubierta(std::string letra, int j)
+{
+  int i=letraNumero(letra);
+
+  return buscaminas_[i][j].descubierto;
+}
+
+int Buscaminas::letraNumero(std::string letra)
+{
+  int i;
+  if(letra.compare("A")==0) i=0;
+  if(letra.compare("B")==0) i=1;
+  if(letra.compare("C")==0) i=2;
+  if(letra.compare("D")==0) i=3;
+  if(letra.compare("E")==0) i=4;
+  if(letra.compare("F")==0) i=5;
+  if(letra.compare("G")==0) i=6;
+  if(letra.compare("H")==0) i=7;
+  if(letra.compare("I")==0) i=8;
+  if(letra.compare("J")==0) i=9;
+
+  return i;
+}

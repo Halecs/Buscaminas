@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
     socklen_t from_len;
 	int salida,on,ret, busca;
     string nombrefich="jugadores.txt";
-    bool entra = false;
+    bool entra=false;
 	std::vector<Jugador> Jugadores;
 	std::vector<Partida> Partidas;
     //Necesitamos un vector de cola de emparejamiento
@@ -178,11 +178,11 @@ int main(int argc, char const *argv[])
                     if(recibido > 0)
                     {
                         std::cout<<buffer;
+                        entra = false;
                         /*Queda ver como se desconecta si esta en partida*/
                         if(strncmp("Salir", buffer,5) == 0)
                         {
                             entra=true;
-                            std::cout<<"ha entrado\n";
                             busca = localizaJugador(i,Jugadores);
                             if(Jugadores[busca].getEstado() != 3 && Jugadores[busca].getEstado() != 4)
                             {
@@ -197,7 +197,7 @@ int main(int argc, char const *argv[])
                                     for (int l = 0; l < Cola.size(); ++l)
                                     {
                                         if(Cola[l].getSocket() == Jugadores[busca].getSocket())
-                                            Cola.erase(Cola.begin() + l-1); //???
+                                            Cola.erase(Cola.begin() + l); //??? Es sin el -1
                                         salirCliente(i,&readfds,Jugadores);
                                         Jugadores[busca].setEstado(5); 
                                     }
@@ -224,7 +224,6 @@ int main(int argc, char const *argv[])
                                         Jugadores[busca].setEstado(5); 
                                         Jugadores[localizaJugador(Partidas[partida].Jugador2().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                     }
-                                    //Volver a poner en cola quizas mas adelante
                                 }
                             }
                         }
@@ -234,40 +233,30 @@ int main(int argc, char const *argv[])
                         if(strncmp("USUARIO ",buffer,7) == 0)
                         {
                             entra=true;
-                            char usuarioAux[250];
                             string user=buffer;
-                            user.copy(usuarioAux,250,8);
-			                string usuario=usuarioAux;
+			                string usuario=user.substr(8,string::npos);
                             busca = localizaJugador(i,Jugadores);
-                            if(Jugadores[busca].getEstado() == SIN_REGISTRAR)
+                            int pos = localizaJugador(usuario,Jugadores);
+                            //Si se encuentra  al jugador 
+                            if(pos != -1)
                             {
                                 //Si la cadena del nombre esta vacia
                                 if(Jugadores[busca].getNombre().length() == 0)
                                 {
-                                    int pos = localizaJugador(usuario,Jugadores);
-                                                                std::cout<<usuario<<Jugadores[0].getNombre()<<endl;
-                                    if( pos != -1)    //Si se encuentra a un usuario con ese nombre en el vector
+			                        if(Jugadores[pos].getEstado()==DESCONECTADO )    //Se comprueba que esta OFF el usuario que hemos encontrado
                                     {
-			                            if(Jugadores[pos].getEstado()==DESCONECTADO )    //Se comprueba que esta OFF el usuario que hemos encontrado
-                                        {
-                                            Jugadores[busca].setAux(pos);               //Se guarda en el usuario actual la posicion en el vector del usuario igual encontrado
-                                            send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
-                                            Jugadores[pos].setEstado(ESPERANDO_PASSWORD);
-				                        }
-				                        else
-                                            send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion2\n",sizeof("-Err. No se puede realizar la accion\n"),0);
-                                    }
-                                    else
-                                      send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion1\n",sizeof("-Err. No se puede realizar la accion\n"),0);
+                                        Jugadores[busca].setAux(pos);               //Se guarda en el usuario actual la posicion en el vector del usuario igual encontrado
+                                        send(Jugadores[busca].getSocket(),"+Ok. Usuario correcto\n",sizeof("+Ok. Usuario correcto\n"),0);
+                                        Jugadores[pos].setEstado(ESPERANDO_PASSWORD);
+				                    }
+				                    else
+                                        send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion, ese usuario esta conectado\n",sizeof("-Err. No se puede realizar la accion, ese usuario esta conectado\n"),0);
                                 }
                                else 
                                    send(Jugadores[busca].getSocket(),"-Err. Este jugador ya tiene un nombre de usuario asignado\n",sizeof("-Err. Este jugador ya tiene un nombre de usuario asignado\n"),0);
                             } 
                             else
-                            {
-                               std::cout<<"El usuario "<<busca<<" esta ya dentro o no esta registrado"<<endl;
-                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida, ya esta logeado o no está registrado\n",sizeof("-Err. Accion invalida, ya esta logeado o no está registrado\n"),0);
-                            }
+                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida, nombre de jugador no registrado\n",sizeof("-Err. Accion invalida, nombre de jugador no registrado\n"),0);
                         }
 
                         if(strncmp("PASSWORD ",buffer,8)==0)
@@ -275,23 +264,20 @@ int main(int argc, char const *argv[])
                             entra=true;
                             char passwordAux[250];
                             string pass=buffer;
-                            std::cout<<pass<<std::endl;
                             string asd = pass.substr(9,string::npos);
                             busca = localizaJugador(i,Jugadores);
-                            std::cout<<asd<<std::endl;
                             if(Jugadores[Jugadores[busca].getAux()].getEstado() == ESPERANDO_PASSWORD or Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
                             {
                                 if(Jugadores[busca].getPassword().length() == 0)
                                 {
                                     //Comprobamos que la contraseña es la misma que hay en el jugador con el que se ha encontrado coincidencia
                                     //if(Jugadores[Jugadores[busca].getAux()].getPassword()==password )
-                                    std::cout<<asd<<"1"<<Jugadores[Jugadores[busca].getAux()].getPassword()<<std::endl;
                                     if(asd.compare(0,asd.size()-1,Jugadores[Jugadores[busca].getAux()].getPassword()) == 0)
                                     {
                                        int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
                                        send(Jugadores[busca].getSocket(),"+Ok. Usuario validado\n",sizeof("+Ok. Usuario validado\n"),0);
                                        Jugadores[r].setSocket(Jugadores[busca].getSocket());
-                                       Jugadores.erase(Jugadores.begin()+busca-1);
+                                       Jugadores.erase(Jugadores.begin()+busca);
                                        Jugadores[r].setEstado(REGISTRADO_SIN_PARTIDA);   
                                     }
                                     else 
@@ -323,8 +309,7 @@ int main(int argc, char const *argv[])
                                     {
                                        string nombre,password;
                                        regex e("(^REGISTRO )(.*)"); 
-                                       aux=regex_replace (aux,e,"$2");
-
+                                       aux=regex_replace(aux,e,"$2");
                                        string aux2=aux;
                                        std::regex u("-u ([a-zA-Z0-9]*)"); 
                                        aux2=regex_replace(aux2,u,"$1");
@@ -354,7 +339,6 @@ int main(int argc, char const *argv[])
                         if(strncmp("INICIAR PARTIDA",buffer,14)== 0)
                         {
                             entra=true;
-                            std::cout<<"Ha entrado\n";
                             int jugador2 = localizaJugador(i,Jugadores);
                             if(Jugadores[jugador2].getEstado() == REGISTRADO_SIN_PARTIDA)
                             {
@@ -389,11 +373,50 @@ int main(int argc, char const *argv[])
                         if(strncmp("DESCUBRIR ",buffer,10)== 0)
                         {
                             entra=true;
+                            string pattern="[A-Z]";
+                            std::smatch m;
+                            regex coincidencia(pattern);
+                            int jugador = localizaJugador(i,Jugadores);
+                            if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
+                            {
+                                int partida = buscarJugadorPartida(Jugadores[jugador], Partidas);
+                                if(Partidas[partida].getTurno() == Partidas[partida].numeroDeJugador(i)) //Si es su turno
+                                {
+                                    string descubre=buffer;
+                                    string numerocas=descubre.substr(11,string::npos-1); //Se queda solo con el numero y la letra pop_back si no funciona
+                                    string letra  = numerocas.substr(0,1);             //La letra
+                                    string numero = numerocas.substr(1,string::npos); //El numero
+                                    int num = std::stoi(numero);
+                                    if((num >= 0 && num < 10) && (std::regex_search(letra,m,coincidencia))) //Casilla valida
+                                    {
+                                        if(!Partidas[partida].getTablero().CasillaDescubierta(letra,num))        //Si ya esta descubierta illo pasar de letra a numero joder
+                                        {
+                                            int status = Partidas[partida].descubrirCasilla(letra,num);
+                                            if(status == 1) //Ha perdido
+                                            {
+
+                                            }
+                                        }
+                                        else
+                                            send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla ya descubierta\n",sizeof("-Err. Accion invalida, casilla ya descubierta\n"),0); 
+                                    }
+                                    else
+                                        send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla invalida\n",sizeof("-Err. Accion invalida, casilla invalida\n"),0); 
+                                }
+                                else
+                                    send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no es tu turno\n",sizeof("-Err. Accion invalida, no es tu turno\n"),0); 
+                            }
+                            else
+                               send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no estas en partida\n",sizeof("-Err. Accion invalida, no estas en partida\n"),0); 
 
                         }
                         if(strncmp("BANDERA ",buffer,8)== 0)
                         {
                             entra=true;
+
+                        }
+                        if(strncmp("HELP",buffer,4)== 0)
+                        {
 
                         }
                         if(entra==false)

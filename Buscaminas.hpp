@@ -38,6 +38,8 @@ class Buscaminas{
       nBanderas_.resize(2,0);
       nMinas_=20;         
      }
+    bool CasillaDescubierta(std::string letra, int j);
+    int letraNumero(std::string letra);
     int getBanderasJugador(int jugador){return nBanderas_[jugador];}
     void generarPartida();
     char* imprimir();

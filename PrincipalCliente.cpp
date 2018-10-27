@@ -65,7 +65,6 @@ int main(){
             {
                 if(buffer[249])
                 {
-                    std::cout<<"holaxd";
                     recv(sd,aux,sizeof(aux),0);
                     std::cout<<buffer<<aux<<std::endl;
                 }

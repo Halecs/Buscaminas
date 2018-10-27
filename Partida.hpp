@@ -20,14 +20,22 @@ class Partida{
     Buscaminas getTablero(){return busc_;}
     Jugador Jugador1(){return jugadores_[0];}
     Jugador Jugador2(){return jugadores_[1];}
-
+    int getTurno(){return turno_;}
+    int numeroDeJugador(int socket)
+    {
+        if(jugadores_[0].getSocket() == socket)
+            return 1;
+        if(jugadores_[1].getSocket() == socket)
+            return 0;
+    }
     int encontrarJugadorOponente(int socket){
         if(jugadores_[0].getSocket() == socket)
             return 1;
         if(jugadores_[1].getSocket() == socket)
             return 0;
     }
-    int descubrirCasilla(int i,int j);
+    int descubrirCasilla(std::string letra,int j);
+    int letraNumero(std::string letra);
 
     int ponerBandera(int i,int j,int jugador);
 
