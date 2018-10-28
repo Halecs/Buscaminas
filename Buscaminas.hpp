@@ -36,7 +36,8 @@ class Buscaminas{
           buscaminas_[i].resize(10);  
       srand(time(NULL)); 
       nBanderas_.resize(2,0);
-      nMinas_=20;         
+      nMinas_=20;     
+      generarPartida();    
      }
     bool CasillaDescubierta(std::string letra, int j);
     int letraNumero(std::string letra);
