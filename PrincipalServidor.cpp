@@ -370,7 +370,6 @@ int main(int argc, char const *argv[])
                                     send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);
                                     send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Es tu turno\n",sizeof("+Ok. Es tu turno\n"),0);  
                                     send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Esperando a que el oponente acabe su turno\n",sizeof("+Ok. Esperando a que el oponente acabe su turno\n"),0);  
-
                                 }
                                 else    //Si no hay gente en cola para partida
                                     send(Jugadores[jugador2].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
@@ -411,8 +410,8 @@ int main(int argc, char const *argv[])
                                                send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
                                                Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                                Jugador[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
                                                eliminar_partida(Partidas,partida);
                                             }
                                             if(status==0)
@@ -422,6 +421,8 @@ int main(int argc, char const *argv[])
                                                strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
+                                               send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Esperando a que el oponente acabe su turno\n",sizeof("+Ok. Esperando a que el oponente acabe su turno\n"),0);  
+                                               send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Es tu turno\n",sizeof("+Ok. Es tu turno\n"),0);  
                                             }
                                         }
                                       
