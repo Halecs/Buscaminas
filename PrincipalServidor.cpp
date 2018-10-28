@@ -391,14 +391,11 @@ int main(int argc, char const *argv[])
                                 {
                                     string descubre=buffer;
                                     descubre=descubre.substr(0,descubre.size()-1);
-                                    //cout<<descubre<<endl;
                                     if(!regex_match(descubre,coincidencia2)) send(Jugadores[jugador].getSocket(),"-Err. Mensaje erroneo\n",sizeof("-Err. Mensaje erroneo\n"),0); 
                                     else{
                                     string numerocas=regex_replace(descubre,coincidencia,"$2");
                                     string numero  = numerocas.substr(2);             //La letra
                                     string letra = numerocas.substr(0,1); //El numero
-                                  
-                                    //cout<<letra<<","<<numero<<endl;
                                     int num = std::stoi(numero);
                                     if((num >= 0 && num < 10)) //Casilla valida
                                     {
@@ -411,12 +408,13 @@ int main(int argc, char const *argv[])
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),"+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
                                                eliminar_partida(Partidas,partida);
                                             }
-                                            if(status==0){
+                                            if(status==0)
+                                            {
                                                std::cout<<Partidas[partida].getTablero().imprimir()<<std::endl; 
-                                               char xd[400];
-                                               strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),xd,sizeof(xd),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xd,sizeof(xd),0);
+                                               char xdd[400];
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
                                             }
                                         }
                                       

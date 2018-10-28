@@ -16,6 +16,11 @@ void Buscaminas::generarPartida(){
     }       
    generarMinas();
    generarNumeros();
+      for(int i=0;i<buscaminas_.size();i++){
+      for(int j=0;j<buscaminas_.size();j++){
+          std::cout<<buscaminas_[i][j].minasAlrededor;
+      }
+    }     
 }
 
 /* Inicializa minas*/
@@ -78,26 +83,23 @@ char* Buscaminas::imprimir()
       {
         int aux = i; 
         impreso += std::to_string(aux++);
-        impreso+=" - ";
-
+        impreso+=" ";
+      }
+      if(buscaminas_[i][j].descubierto)
+      {
+        impreso+=buscaminas_[i][j].minasAlrededor;impreso+=" ";
       }
       else
-      {
-        if(buscaminas_[i][j].descubierto)
-        {
-          impreso+=buscaminas_[i][j].minasAlrededor;impreso+=" ";
-        }
+      	if(buscaminas_[i][j].bandera == 0)
+        	impreso+="- ";
         else
-        	if(buscaminas_[i][j].bandera == 0)
-          	impreso+="- ";
-          else
-          	if(buscaminas_[i][j].bandera == 1)
-          		impreso+="A ";
-          	else if(buscaminas_[i][j].bandera == 2)
-          		impreso+="B ";
-          		else if(buscaminas_[i][j].bandera == 3)
-          			impreso+="AB ";
-      }
+        	if(buscaminas_[i][j].bandera == 1)
+        		impreso+="A ";
+        	else if(buscaminas_[i][j].bandera == 2)
+        		impreso+="B ";
+        		else if(buscaminas_[i][j].bandera == 3)
+        			impreso+="AB ";
+
     }
   }
   char* xd = &impreso[0]; 
@@ -122,22 +124,21 @@ bool Buscaminas::ponerBandera(int i,int j, int jugador)
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
 int Buscaminas::descubrirCasilla(int i,int j)
 {
-       //std::cout<<i<<","<<j<<std::endl;
+       std::cout<<i<<","<<j<<std::endl;
 	if(!buscaminas_[i][j].descubierto)
 	{
 		buscaminas_[i][j].descubierto = true;
-                if(buscaminas_[i][j].minasAlrededor==0){
-                    for(int k=i-1;k<=i+1;k++){  
-  
-                      for(int l=j-1;l<=j+1;l++){
-                   
-                         if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())&&(k!=i)&&(l!=j)){
-                               
-                              descubrirCasilla(k,l);
-                          } 
-                      }
-                    }
-                }
+    if((buscaminas_[i][j].minasAlrededor==0)&&(!buscaminas_[i][j].mina))
+    {
+      for(int k=i-1;k<=i+1;k++)
+      {  
+        for(int l=j-1;l<=j+1;l++)
+        {
+          if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())&&(k!=i)&&(l!=j))
+            descubrirCasilla(k,l);
+        }
+      }
+    }
 		if(buscaminas_[i][j].mina == true)
 			return 1;
 		else 
