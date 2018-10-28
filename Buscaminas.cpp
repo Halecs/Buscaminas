@@ -83,12 +83,10 @@ char* Buscaminas::imprimir()
       {
         int aux = i; 
         impreso += std::to_string(aux++);
-        impreso+=" - ";
+        impreso += " ";
 
-      }
-      else
-      {
-        if(buscaminas_[i][j].descubierto)
+      }      
+      if(buscaminas_[i][j].descubierto)
         {
           impreso+=std::to_string(buscaminas_[i][j].minasAlrededor);impreso+=" ";
         }
@@ -103,13 +101,14 @@ char* Buscaminas::imprimir()
           		else if(buscaminas_[i][j].bandera == 3)
           			impreso+="AB ";
         }
-       }
+       
     }
   }
  }
   char* xd = &impreso[0]; 
   return xd;
 }
+
 
 
 
