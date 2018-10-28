@@ -15,12 +15,7 @@ void Buscaminas::generarPartida(){
       }
     }       
    generarMinas();
-   generarNumeros();
-      for(int i=0;i<buscaminas_.size();i++){
-      for(int j=0;j<buscaminas_.size();j++){
-          std::cout<<buscaminas_[i][j].minasAlrededor;
-      }
-    }     
+   generarNumeros();   
 }
 
 /* Inicializa minas*/

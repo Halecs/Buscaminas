@@ -362,26 +362,29 @@ int main(int argc, char const *argv[])
                                     Partidas[partidaActual].getTablero().generarPartida();
                                     
                                     std::cout<<Partidas[partidaActual].getTablero().imprimir()<<std::endl; 
-                                    char xd[400];
-                                    strcpy(xd,Partidas[Partidas.size() - 1].getTablero().imprimir());
-                                    send(Jugadores[jugador1].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
-                                    send(Jugadores[jugador1].getSocket(),xd,sizeof(xd),0);
-                                    send(Jugadores[jugador2].getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
-                                    send(Jugadores[jugador2].getSocket(),xd,sizeof(xd),0);
+                                    char xddd[400];
+                                    strcpy(xddd,Partidas[partidaActual].getTablero().imprimir());
+                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
+                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);
+                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
+                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);
+                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Es tu turno\n",sizeof("+Ok. Es tu turno\n"),0);  
+                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Esperando a que el oponente acabe su turno\n",sizeof("+Ok. Esperando a que el oponente acabe su turno\n"),0);  
+
                                 }
                                 else    //Si no hay gente en cola para partida
                                     send(Jugadores[jugador2].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
                             }
                             else
-                               send(Jugadores[jugador2].getSocket(),"-Err. Accion invalida, no estas logeado\n",sizeof("-Err. Accion invalida, no estas logeado\n"),0); 
+                               send(Jugadores[jugador2].getSocket(),"-Err. Accion invalida, no estas logeado o estas en partida\n",sizeof("-Err. Accion invalida, no estas logeado o estas en partida\n"),0); 
                         }
 
                         if(strncmp("DESCUBRIR ",buffer,9)== 0)
                         {
                             pthread_mutex_lock (&sem);
                             entra=true;
-                            string pattern="(DESCUBRIR )([A-Z],[1-9]$)";
-                            regex coincidencia2("DESCUBRIR [A-Z],[1-9]$");
+                            string pattern="(DESCUBRIR )([A-Z],[0-9]$)";
+                            regex coincidencia2("DESCUBRIR [A-Z],[0-9]$");
                             regex coincidencia(pattern);
                             int jugador = localizaJugador(i,Jugadores);
                             if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
@@ -395,7 +398,7 @@ int main(int argc, char const *argv[])
                                     else{
                                     string numerocas=regex_replace(descubre,coincidencia,"$2");
                                     string numero  = numerocas.substr(2);             //La letra
-                                    string letra = numerocas.substr(0,1); //El numero
+                                    string letra = numerocas.substr(0,1);               //El numero
                                     int num = std::stoi(numero);
                                     if((num >= 0 && num < 10)) //Casilla valida
                                     {
@@ -404,8 +407,12 @@ int main(int argc, char const *argv[])
                                             int status = Partidas[partida].descubrirCasilla(letra,num);
                                             if(status == 1) //Ha perdido
                                             {
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
+                                               Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                               Jugador[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
                                                eliminar_partida(Partidas,partida);
                                             }
                                             if(status==0)
