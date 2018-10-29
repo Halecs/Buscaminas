@@ -101,6 +101,7 @@ int main(int argc, char const *argv[])
             if(s.length() != 0 and s.length() != 0)
             {
                 aux.setNombre(s);
+                aux.setSocket(-1);
                 aux.setPassword(d);
                 aux.setEstado(5);
                 Jugadores.push_back(aux);
@@ -189,6 +190,8 @@ int main(int argc, char const *argv[])
                             if(Jugadores[busca].getEstado() != 3 && Jugadores[busca].getEstado() != 4)
                             {
                                 salirCliente(i,&readfds,Jugadores);
+                
+                                Jugadores[busca].setSocket(-1); 
                                 Jugadores[busca].setEstado(5); 
                             }
                             else // Si estan en partida o buscando
@@ -243,8 +246,7 @@ int main(int argc, char const *argv[])
                             if(pos != -1)
                             {
                                 //Si la cadena del nombre esta vacia
-                                std::cout<<Jugadores[busca].getNombre()<<endl;
-                                if(Jugadores[busca].getNombre().length() == 0)
+                                if(Jugadores[busca].getEstado() == 0 or Jugadores[busca].getEstado() == 5)
                                 {
 			                        if(Jugadores[pos].getEstado()==DESCONECTADO )    //Se comprueba que esta OFF el usuario que hemos encontrado
                                     {
@@ -277,6 +279,7 @@ int main(int argc, char const *argv[])
                                 {
                                     if(asd.compare(0,asd.size()-1,Jugadores[Jugadores[busca].getAux()].getPassword()) == 0)
                                     {
+                                       //std::cout<<Jugadores[busca].getAux()<<"xdxd"<<busca<<endl; //Son iguales 
                                        int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
                                        send(Jugadores[busca].getSocket(),"+Ok. Usuario validado\n",sizeof("+Ok. Usuario validado\n"),0);
                                        Jugadores[r].setSocket(Jugadores[busca].getSocket());
@@ -300,7 +303,7 @@ int main(int argc, char const *argv[])
                             string aux=buffer; 
                             size_t foundName=aux.find("-u ");
                             size_t foundPass=aux.find("-p ");
-                            if(Jugadores[busca].getEstado() == 0)
+                            if(Jugadores[busca].getEstado() == 0 or Jugadores[busca].getEstado() == 5)
                             {
                                 //Comprobamos que hemos encontrado -u y -p en el mensaje del cliente
                                 if((foundName==string::npos)||(foundPass==string::npos))
