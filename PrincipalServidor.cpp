@@ -361,15 +361,28 @@ int main(int argc, char const *argv[])
                                     Jugadores[jugador1].setPartida(partidaActual);      
                                     Partidas[partidaActual].getTablero().generarPartida();
                                     
-                                    std::cout<<Partidas[partidaActual].getTablero().imprimir()<<std::endl; 
-                                    char xddd[400];
+                                    std::cout<<Partidas[partidaActual].getTablero().imprimir()<<std::endl;
+
+                                    char xddd[255];
+                                    bzero(xddd,sizeof(xddd));
+
+                                    strcpy(xddd,"+Ok. Se ha encontrado un jugador oponente, empezando partida\n");
+                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);  
+                                    
                                     strcpy(xddd,Partidas[partidaActual].getTablero().imprimir());
-                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
                                     send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);
-                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Se ha encontrado un jugador oponente, empezando partida\n",sizeof("+Ok. Se ha encontrado un jugador oponente, empezando partida\n"),0);  
+                                    
+                                    strcpy(xddd,"+Ok. Se ha encontrado un jugador oponente, empezando partida\n");
+                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);  
+                                    
+                                    strcpy(xddd,Partidas[partidaActual].getTablero().imprimir());
                                     send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);
-                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),"+Ok. Es tu turno\n",sizeof("+Ok. Es tu turno\n"),0);  
-                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),"+Ok. Esperando a que el oponente acabe su turno\n",sizeof("+Ok. Esperando a que el oponente acabe su turno\n"),0);  
+                                    
+                                    strcpy(xddd,"+Ok. Es tu turno\n");
+                                    send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);  
+
+                                    strcpy(xddd,"+Ok. Esperando a que el oponente acabe su turno\n");
+                                    send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);  
                                 }
                                 else    //Si no hay gente en cola para partida
                                     send(Jugadores[jugador2].getSocket(),"+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n",sizeof("+Ok. Jugador puesto en cola correctamente, a la espera de otro jugador\n"),0);  
@@ -417,15 +430,22 @@ int main(int argc, char const *argv[])
                                             if(status==0)
                                             {
                                                std::cout<<Partidas[partida].getTablero().imprimir()<<std::endl; 
-                                               char xdd[400];
+                                               char xdd[255];
+                                               bzero(xdd,sizeof(buffer));
+
                                                strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
+
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Ok. Esperando a que el oponente acabe su turno\n",sizeof("+Ok. Esperando a que el oponente acabe su turno\n"),0);  
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok. Es tu turno\n",sizeof("+Ok. Es tu turno\n"),0);  
+
+                                               strcpy(xdd,"+Ok. Esperando a que el oponente acabe su turno\n");
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0); 
+
+                                               strcpy(xdd,"+Ok. Es tu turno\n");
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);  
                                             }
                                         }
-                                      
                                         else
                                             send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla ya descubierta\n",sizeof("-Err. Accion invalida, casilla ya descubierta\n"),0); 
                                     }

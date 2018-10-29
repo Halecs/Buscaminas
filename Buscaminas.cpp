@@ -100,6 +100,7 @@ char* Buscaminas::imprimir()
     }
   }
  }
+ std::cout<<impreso.size()<<std::endl;
   char* xd = &impreso[0]; 
   return xd;
 }
