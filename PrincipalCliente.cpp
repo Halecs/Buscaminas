@@ -11,6 +11,8 @@
 #include <arpa/inet.h>
 #include <iostream>
 
+void decodTablero(char* buffer);
+
 int main(){
   int sd;
     struct sockaddr_in sockname;
@@ -60,8 +62,10 @@ int main(){
                 fin =1;
                 std::cout<<"Desconectado del servidor correctamente"<<std::endl;
             }
-            else
-                std::cout<<buffer<<std::endl;
+            else{
+               if(strncmp(buffer,"+Ok.Tablero.",12)==0) decodTablero(buffer);
+               else std::cout<<buffer<<std::endl;
+            }
         }
         else
         {
@@ -78,4 +82,22 @@ int main(){
     }while(fin == 0);
   return 0;
    }
+
+
+
+void decodTablero(char* buffer){
+    std::string aux=buffer;
+    std::string impreso;
+    impreso="  A B C D E F G H I J\n0 "; 
+    int j=1;
+    for(int i=12;i<aux.size()-1;i++){
+       if(aux[i]==',') impreso+=" ";
+       else{
+         if(aux[i]==';'){ impreso+="\n";impreso += std::to_string(j++);impreso += " ";}
+         else impreso+=aux[i];
+       }
+     }
+
+  std::cout<<impreso<<std::endl;
+ }
 

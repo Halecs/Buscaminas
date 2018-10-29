@@ -210,10 +210,11 @@ int main(int argc, char const *argv[])
                                 //En partida
                                 if(Jugadores[busca].getEstado() == 4)
                                 {
+                                    pthread_mutex_lock (&sem);
                                     int partida = buscarJugadorPartida(Jugadores[busca], Partidas); //Encontramos la partida
                                     int elotro = Partidas[partida].encontrarJugadorOponente(Jugadores[busca].getSocket()); //Buscamos el socket del otro jugador de la partida
                                     if(elotro == 0) // El jugador 1 es el que se va a salir
-                                    {
+                                    {                            pthread_mutex_lock (&sem);
                                         send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
                                         send(Partidas[partida].socketJugador1(),"-Err. Un jugador se ha desconectado de la partida, se ha cancelado la partida, para volver a buscar 'INICIAR PARTIDA'\n",sizeof("-Err. Un jugador se ha desconectado de la partida, se ha cancelado la partida, para volver a buscar 'INICIAR PARTIDA'\n"),0);
                                         salirCliente(i,&readfds,Jugadores);
@@ -229,6 +230,7 @@ int main(int argc, char const *argv[])
                                         Jugadores[busca].setEstado(5); 
                                         Jugadores[localizaJugador(Partidas[partida].Jugador2().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                     }
+                                    pthread_mutex_unlock (&sem);
                                 }
                             }
                         }
@@ -371,13 +373,13 @@ int main(int argc, char const *argv[])
                                     strcpy(xddd,"+Ok. Se ha encontrado un jugador oponente, empezando partida\n");
                                     send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);  
                                     
-                                    strcpy(xddd,Partidas[partidaActual].getTablero().imprimir());
+                                    strcpy(xddd,Partidas[partidaActual].impresoPart());
                                     send(Partidas[partidaActual].getJugadorTurno().getSocket(),xddd,sizeof(xddd),0);
                                     
                                     strcpy(xddd,"+Ok. Se ha encontrado un jugador oponente, empezando partida\n");
                                     send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);  
                                     
-                                    strcpy(xddd,Partidas[partidaActual].getTablero().imprimir());
+                                    strcpy(xddd,Partidas[partidaActual].impresoPart());
                                     send(Partidas[partidaActual].getJugadorNoTurno().getSocket(),xddd,sizeof(xddd),0);
                                     
                                     strcpy(xddd,"+Ok. Es tu turno\n");
@@ -434,11 +436,11 @@ int main(int argc, char const *argv[])
                                                char xdd[255];
                                                bzero(xdd,sizeof(xdd));
 
-                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].getTablero().imprimir()<<endl;
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
+                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].impresoPart()<<endl;
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
 
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
 
                                                strcpy(xdd,"+Ok. Esperando a que el oponente acabe su turno\n");
@@ -470,9 +472,69 @@ int main(int argc, char const *argv[])
                           pthread_mutex_unlock (&sem);
                           
                         }
-                        if(strncmp("BANDERA ",buffer,8)== 0)
+                        if(strncmp("BANDERA ",buffer,7)== 0)
                         {
-                          
+                            pthread_mutex_lock (&sem);
+                            entra=true;
+                            string pattern="(BANDERA )([A-Z],[0-9]$)";
+                            regex coincidencia2("BANDERA [A-Z],[0-9]$");
+                            regex coincidencia(pattern);
+                            int jugador = localizaJugador(i,Jugadores);
+                            if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
+                            {
+                                int partida = Jugadores[jugador].getPartida();
+                                if(Partidas[partida].esTurno(Jugadores[jugador])) //Si es su turno
+                                {
+                                    string bandera=buffer;
+                                    bandera=bandera.substr(0,bandera.size()-1);
+                                    if(!regex_match(bandera,coincidencia2)) send(Jugadores[jugador].getSocket(),"-Err. Mensaje erroneo\n",sizeof("-Err. Mensaje erroneo\n"),0); 
+                                    else{
+                                    string numerocas=regex_replace(bandera,coincidencia,"$2");
+                                    string numero  = numerocas.substr(2);             //La letra
+                                    string letra = numerocas.substr(0,1);               //El numero
+                                    int num = std::stoi(numero);
+                                    if((num >= 0 && num < 10)) //Casilla valida
+                                    {
+                                    
+                                       int status = Partidas[partida].ponerBandera(letra,num,Partidas[partida].getTurno());
+                                            if(status == 1) //Ha perdido
+                                            {
+
+                                            }
+                                            if(status==0)
+                                            {
+                                               char xdd[255];
+                                               bzero(xdd,sizeof(xdd));
+
+                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].impresoPart()<<endl;
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
+
+                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
+
+                                               strcpy(xdd,"+Ok. Esperando a que el oponente acabe su turno\n");
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0); 
+
+                                               strcpy(xdd,"+Ok. Es tu turno\n");
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);  
+                                            }
+                                            if(status == -1)
+                                            {
+                                                
+                                            }
+                                        }
+                                        
+                                    }
+                                    
+                                    }
+                                
+                                else
+                                    send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no es tu turno\n",sizeof("-Err. Accion invalida, no es tu turno\n"),0); 
+                            }
+                            else
+                               send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no estas en partida\n",sizeof("-Err. Accion invalida, no estas en partida\n"),0); 
+                          pthread_mutex_unlock (&sem);
 
                         }
                         if(strncmp("HELP",buffer,4)== 0)

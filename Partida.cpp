@@ -1,6 +1,7 @@
 #include "Partida.hpp"
 #include "Buscaminas.hpp"
 #include "Jugador.hpp"
+#include <cstring>
 
 int Partida::descubrirCasilla(std::string letra,int j){
    int i = letraNumero(letra);
@@ -19,14 +20,16 @@ int Partida::descubrirCasilla(std::string letra,int j){
 }
 
 
+bool Partida::comprobarBanderas(int jugador){
+   return busc_.banderaCorrecta(jugador);}
 
-
-int Partida::ponerBandera(int i,int j,int jugador){
-                 turno_=(turno_+1)%2;
+int Partida::ponerBandera(std::string letra,int j,int jugador){
+             int i = letraNumero(letra);
                  if(!busc_.ponerBandera(i,j, jugador)) return -1;
                  else if(busc_.getBanderasJugador(jugador)==10) return 1;
-                 else{ busc_.imprimir(); return 0;}
+                 else{  turno_=(turno_+1)%2; return 0;}
            }
+
 int Partida::letraNumero(std::string letra)
 {
 
@@ -45,3 +48,40 @@ int Partida::letraNumero(std::string letra)
   return i;
 
 }
+
+
+
+char* Partida::impresoPart(){ 
+   std::string imp="+Ok.Tablero.";
+   std::string aux=busc_.imprimir();
+   size_t space_pos = aux.find("\n");
+   aux=aux.substr(space_pos+1);
+   while( space_pos!=std::string::npos){
+
+      std::string s=aux.substr(0,space_pos);
+      if(s.size()>6){
+      size_t finding=s.find(" ");
+      s=s.substr(finding+1);
+
+       while(finding!=std::string::npos){
+           std::string x=s.substr(0,finding); 
+
+           
+           s=s.substr(finding+1);
+           imp+=x;imp+=",";
+           finding=s.find(" ");
+        }
+        imp+=s;
+        if(imp.rfind(",")==imp.size()-1)imp=imp.substr(0,imp.size()-1);  
+      imp+=";";
+     }
+      aux=aux.substr(space_pos+1);
+
+      space_pos = aux.find("\n");
+  }
+//std::cout<<imp;
+char *povaia = new char[imp.length() + 1];
+strcpy(povaia, imp.c_str());
+return povaia;
+   }
+

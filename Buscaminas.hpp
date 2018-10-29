@@ -39,11 +39,12 @@ class Buscaminas{
       nMinas_=20;     
       generarPartida();    
      }
+    bool banderaCorrecta(int jugador);
     bool CasillaDescubierta(std::string letra, int j);
     int letraNumero(std::string letra);
     int getBanderasJugador(int jugador){return nBanderas_[jugador];}
     void generarPartida();
-    char* imprimir();
+    std::string imprimir();
     bool ponerBandera(int i,int j, int jugador);
     int  descubrirCasilla(int i, int j);
 

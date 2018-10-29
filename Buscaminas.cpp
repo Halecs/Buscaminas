@@ -64,7 +64,7 @@ void Buscaminas::generarNumeros(){
 
 }
 
-char* Buscaminas::imprimir()
+std::string Buscaminas::imprimir()
 {
 
   std::string impreso;
@@ -100,12 +100,21 @@ char* Buscaminas::imprimir()
     }
   }
  }
-  char* xd = &impreso[0]; 
-  return xd;
+  impreso+="\n";
+  return impreso;
 }
 
 
-
+bool Buscaminas::banderaCorrecta(int jugador){
+     /*Comprueba si las banderas del Jugador son correctas*/
+  for (int i = 0; i < buscaminas_.size(); ++i){
+    for (int j = 0; j < buscaminas_.size(); ++j){
+      if((!buscaminas_[i][j].mina)&&((buscaminas_[i][j].bandera == jugador)||(buscaminas_[i][j].bandera == 3)))
+         return false;
+    }
+  }
+  return true;
+}
 
 bool Buscaminas::ponerBandera(int i,int j, int jugador)
 {
