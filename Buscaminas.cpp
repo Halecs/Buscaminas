@@ -133,7 +133,7 @@ int Buscaminas::descubrirCasilla(int i,int j)
       {  
         for(int l=j-1;l<=j+1;l++)
         {
-          if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size())&&(k!=i)&&(l!=j))
+          if((k>=0)&&(l>=0)&&(k<buscaminas_.size())&&(l<buscaminas_.size()))
             descubrirCasilla(k,l);
         }
       }
