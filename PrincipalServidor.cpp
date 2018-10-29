@@ -243,6 +243,7 @@ int main(int argc, char const *argv[])
                             if(pos != -1)
                             {
                                 //Si la cadena del nombre esta vacia
+                                std::cout<<Jugadores[busca].getNombre()<<endl;
                                 if(Jugadores[busca].getNombre().length() == 0)
                                 {
 			                        if(Jugadores[pos].getEstado()==DESCONECTADO )    //Se comprueba que esta OFF el usuario que hemos encontrado
@@ -274,8 +275,6 @@ int main(int argc, char const *argv[])
                             {
                                 if(Jugadores[busca].getPassword().length() == 0)
                                 {
-                                    //Comprobamos que la contraseña es la misma que hay en el jugador con el que se ha encontrado coincidencia
-                                    //if(Jugadores[Jugadores[busca].getAux()].getPassword()==password )
                                     if(asd.compare(0,asd.size()-1,Jugadores[Jugadores[busca].getAux()].getPassword()) == 0)
                                     {
                                        int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
@@ -362,8 +361,6 @@ int main(int argc, char const *argv[])
                                     Jugadores[jugador2].setPartida(partidaActual);
                                     Jugadores[jugador1].setPartida(partidaActual);      
                                     Partidas[partidaActual].getTablero().generarPartida();
-                                    
-                                    std::cout<<Partidas[partidaActual].getTablero().imprimir()<<std::endl;
 
                                     char xddd[255];
                                     bzero(xddd,sizeof(xddd));
@@ -450,7 +447,7 @@ int main(int argc, char const *argv[])
                                             if(status == -1)
                                             {
                                                 char aviso[255];
-                                                strcopy(aviso,"Casilla ya descubierta, prueba con otra crack");
+                                                strcpy(aviso,"Casilla ya descubierta, prueba con otra crack");
                                                 send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);
                                             }
                                         }
