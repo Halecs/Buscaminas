@@ -100,7 +100,6 @@ char* Buscaminas::imprimir()
     }
   }
  }
- std::cout<<impreso.size()<<std::endl;
   char* xd = &impreso[0]; 
   return xd;
 }
@@ -124,7 +123,6 @@ bool Buscaminas::ponerBandera(int i,int j, int jugador)
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
 int Buscaminas::descubrirCasilla(int i,int j)
 {
-       std::cout<<i<<","<<j<<std::endl;
 	if(!buscaminas_[i][j].descubierto)
 	{
 		buscaminas_[i][j].descubierto = true;

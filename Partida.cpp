@@ -4,13 +4,18 @@
 
 int Partida::descubrirCasilla(std::string letra,int j){
    int i = letraNumero(letra);
-   turno_=(turno_+1)%2;
+   //turno_=(turno_+1)%2;
    int resultado = busc_.descubrirCasilla(j,i);
   if(resultado == 1)
     return 1;
   else
-    return 0;
-
+    if(resultado == 0)
+    {
+      turno_=(turno_+1)%2;
+      return 0;
+    }
+    if(resultado == -1)
+      return -1;
 }
 
 

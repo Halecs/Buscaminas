@@ -255,7 +255,9 @@ int main(int argc, char const *argv[])
                                         send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion, ese usuario esta conectado\n",sizeof("-Err. No se puede realizar la accion, ese usuario esta conectado\n"),0);
                                 }
                                else 
+                               {
                                    send(Jugadores[busca].getSocket(),"-Err. Este jugador ya tiene un nombre de usuario asignado\n",sizeof("-Err. Este jugador ya tiene un nombre de usuario asignado\n"),0);
+                                }
                             } 
                             else
                                send(Jugadores[busca].getSocket(),"-Err. Accion invalida, nombre de jugador no registrado\n",sizeof("-Err. Accion invalida, nombre de jugador no registrado\n"),0);
@@ -419,8 +421,8 @@ int main(int argc, char const *argv[])
                                             int status = Partidas[partida].descubrirCasilla(letra,num);
                                             if(status == 1) //Ha perdido
                                             {
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
                                                Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                                Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                                send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
@@ -429,10 +431,10 @@ int main(int argc, char const *argv[])
                                             }
                                             if(status==0)
                                             {
-                                               std::cout<<Partidas[partida].getTablero().imprimir()<<std::endl; 
                                                char xdd[255];
-                                               bzero(xdd,sizeof(buffer));
+                                               bzero(xdd,sizeof(xdd));
 
+                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].getTablero().imprimir()<<endl;
                                                strcpy(xdd,Partidas[Partidas.size() - 1].getTablero().imprimir());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
 
@@ -444,6 +446,12 @@ int main(int argc, char const *argv[])
 
                                                strcpy(xdd,"+Ok. Es tu turno\n");
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);  
+                                            }
+                                            if(status == -1)
+                                            {
+                                                char aviso[255];
+                                                strcopy(aviso,"Casilla ya descubierta, prueba con otra crack");
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);
                                             }
                                         }
                                         else
