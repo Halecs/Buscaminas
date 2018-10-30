@@ -571,7 +571,7 @@ int main(int argc, char const *argv[])
 
                         }
 
-                        if(entra==false)
+                        if((strncmp("USUARIO ",buffer,7) != 0)&&(strncmp("BANDERA ",buffer,7)!= 0)&&(strncmp("DESCUBRIR ",buffer,9)!= 0)&&(strncmp("INICIAR PARTIDA",buffer,14)!= 0)&&(strncmp("Salir", buffer,5) != 0)&&(strncmp("REGISTRO ",buffer,9)!=0)&&(strncmp("PASSWORD ",buffer,8)!=0))
                         {
                             busca = localizaJugador(i,Jugadores);
                             //send(Jugadores[busca].getSocket(),"-Err. Comando invalido\n",sizeof("-Err.Comando invalido\n"),0); 
