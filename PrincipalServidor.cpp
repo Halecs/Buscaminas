@@ -423,8 +423,8 @@ int main(int argc, char const *argv[])
                                     int num = std::stoi(numero);
                                     if((num >= 0 && num < 10)) //Casilla valida
                                     {
-                                        if(!Partidas[partida].getTablero().CasillaDescubierta(letra,num))        //Si ya esta descubierta illo pasar de letra a numero joder
-                                        {
+                                        //if(!Partidas[partida].getTablero().CasillaDescubierta(letra,num))        //Si ya esta descubierta illo pasar de letra a numero joder
+                                        //{
                                             int status = Partidas[partida].descubrirCasilla(letra,num);
                                             if(status == 1) //Ha perdido
                                             {
@@ -457,12 +457,12 @@ int main(int argc, char const *argv[])
                                             if(status == -1)
                                             {
                                                 char aviso[255];
-                                                strcpy(aviso,"+Err. Casilla ya descubierta, prueba con otra crack");
+                                                strcpy(aviso,"-Err. Casilla ya descubierta, prueba con otra crack");
                                                 send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);
                                             }
-                                        }
-                                        else
-                                            send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla ya descubierta\n",sizeof("-Err. Accion invalida, casilla ya descubierta\n"),0); 
+                                        //}
+                                        //else
+                                            //send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, casilla ya descubierta\n",sizeof("-Err. Accion invalida, casilla ya descubierta\n"),0); 
                                     }
                                     
                                     else

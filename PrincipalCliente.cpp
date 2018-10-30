@@ -109,5 +109,5 @@ void decodTablero(char* buffer){
      }
    }
   std::cout<<impreso<<std::endl;
- }
+}
 
