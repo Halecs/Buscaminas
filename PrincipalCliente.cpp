@@ -97,7 +97,13 @@ void decodTablero(char* buffer){
     for(int i=12;i<aux.size()-1;i++){
        if(aux[i]==',') impreso+=" ";
        else{
-         if(aux[i]==';'){ impreso+="\n";impreso += std::to_string(j++);impreso += " ";}
+         if(aux[i]==';'){
+            impreso+="\n";
+            impreso += std::to_string(j++);
+            impreso += " ";
+           }
+         else{
+         if(aux[i]=='C')impreso+="AB";
          else impreso+=aux[i];
        }
      }

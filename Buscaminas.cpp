@@ -100,6 +100,7 @@ std::string Buscaminas::imprimir()
     }
   }
  }
+  std::cout<<impreso;
   impreso+="\n";
   return impreso;
 }
