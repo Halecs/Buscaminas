@@ -92,22 +92,22 @@ int main(int argc, char **argv){
 void decodTablero(char* buffer){
     std::string aux=buffer;
     std::string impreso;
-    impreso="  A B C D E F G H I J\n0 "; 
+    impreso="   A  B  C  D  E  F  G  H  I  J\n0  "; 
     int j=1;
     for(int i=12;i<aux.size()-1;i++){
-       if(aux[i]==',') impreso+=" ";
+       if(aux[i]==',') impreso+="  ";
        else{
          if(aux[i]==';'){
             impreso+="\n";
             impreso += std::to_string(j++);
-            impreso += " ";
+            impreso += "  ";
            }
          else{
          if(aux[i]=='C')impreso+="AB";
          else impreso+=aux[i];
        }
      }
-
+   }
   std::cout<<impreso<<std::endl;
  }
 

@@ -94,13 +94,12 @@ std::string Buscaminas::imprimir()
           	else if(buscaminas_[i][j].bandera == 2)
           		impreso+="B ";
           		else if(buscaminas_[i][j].bandera == 3)
-          			impreso+="AB ";
+          			impreso+="C ";
         }
        
     }
   }
  }
-  std::cout<<impreso;
   impreso+="\n";
   return impreso;
 }
