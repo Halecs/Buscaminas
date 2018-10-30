@@ -1,6 +1,7 @@
 #include "Partida.hpp"
 #include "Buscaminas.hpp"
 #include "Jugador.hpp"
+#include <iostream>
 #include <cstring>
 
 int Partida::descubrirCasilla(std::string letra,int j){
@@ -88,7 +89,7 @@ char* Partida::impresoPart(){
 
       space_pos = aux.find("\n");
   }
-//std::cout<<imp;
+std::cout<<imp;
 char *povaia = new char[imp.length() + 1];
 strcpy(povaia, imp.c_str());
 return povaia;
