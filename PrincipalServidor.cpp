@@ -436,11 +436,11 @@ int main(int argc, char const *argv[])
                                                char xdd[255];
                                                bzero(xdd,sizeof(xdd));
 
-                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].impresoPart()<<endl;
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
+                                               std::cout<<"1"<<Partidas[partida].impresoPart()<<endl;
+                                               strcpy(xdd,Partidas[partida].impresoPart());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
 
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
+                                               strcpy(xdd,Partidas[partida].impresoPart());
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
 
                                                strcpy(xdd,"+Ok. Esperando a que el oponente acabe su turno\n");
@@ -452,7 +452,7 @@ int main(int argc, char const *argv[])
                                             if(status == -1)
                                             {
                                                 char aviso[255];
-                                                strcpy(aviso,"Casilla ya descubierta, prueba con otra crack");
+                                                strcpy(aviso,"+Err. Casilla ya descubierta, prueba con otra crack");
                                                 send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);
                                             }
                                         }
@@ -488,59 +488,89 @@ int main(int argc, char const *argv[])
                                     string bandera=buffer;
                                     bandera=bandera.substr(0,bandera.size()-1);
                                     if(!regex_match(bandera,coincidencia2)) send(Jugadores[jugador].getSocket(),"-Err. Mensaje erroneo\n",sizeof("-Err. Mensaje erroneo\n"),0); 
-                                    else{
-                                    string numerocas=regex_replace(bandera,coincidencia,"$2");
-                                    string numero  = numerocas.substr(2);             //La letra
-                                    string letra = numerocas.substr(0,1);               //El numero
-                                    int num = std::stoi(numero);
-                                    if((num >= 0 && num < 10)) //Casilla valida
+                                    else
                                     {
-                                    
-                                       int status = Partidas[partida].ponerBandera(letra,num,Partidas[partida].getTurno());
-                                            if(status == 1) //Ha perdido
+                                        string numerocas=regex_replace(bandera,coincidencia,"$2");
+                                        string numero  = numerocas.substr(2);             //La letra
+                                        string letra = numerocas.substr(0,1);               //El numero
+                                        int num = std::stoi(numero);
+                                        if((num >= 0 && num < 10)) //Casilla valida
+                                        {
+                                            std::cout<<"casilla "<<letra<<" "<<num<<endl;
+                                            int status = Partidas[partida].ponerBandera(letra,num,Partidas[partida].getTurno());
+                                            std::cout<<"return "<<status<<endl;
+                                            if(status == 1) //Tiene 10 banderas
                                             {
+                                                char resultado[255];
+                                                bzero(resultado,sizeof(resultado));
 
+                                                strcpy(resultado,Partidas[partida].impresoPart());
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),resultado,sizeof(resultado),0);
+                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),resultado,sizeof(resultado),0);
+
+                                                strcpy(resultado,"Ok. Ya has introducido 10 banderas, comprobando si tu solucion es correcta");
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),resultado,sizeof(resultado),0);
+
+                                                if(Partidas[partida].comprobarBanderas(Partidas[partida].getTurno())) //Ha ganado
+                                                {
+                                                    strcpy(resultado,"+Ok. Has ganado, todas las banderas son correctas");
+                                                    send(Partidas[partida].getJugadorTurno().getSocket(),resultado,sizeof(resultado),0);
+                                                    strcpy(resultado,"+Ok. Has perdido, el jugador oponente ha acertado todas las banderas");
+                                                    send(Partidas[partida].getJugadorNoTurno().getSocket(),resultado,sizeof(resultado),0);
+                                                }
+                                                else //Ha perdido
+                                                {
+                                                    strcpy(resultado,"+Ok. Has ganado, todas las banderas son correctas");
+                                                    send(Partidas[partida].getJugadorNoTurno().getSocket(),resultado,sizeof(resultado),0);
+                                                    strcpy(resultado,"+Ok. Has perdido, el jugador oponente ha acertado todas las banderas");
+                                                    send(Partidas[partida].getJugadorTurno().getSocket(),resultado,sizeof(resultado),0);
+                                                }
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
+                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
+                                                Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                                Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                                eliminar_partida(Partidas,partida);
                                             }
                                             if(status==0)
                                             {
-                                               char xdd[255];
-                                               bzero(xdd,sizeof(xdd));
+                                               char banderitas[255];
+                                               bzero(banderitas,sizeof(banderitas));
 
-                                               std::cout<<"1"<<Partidas[Partidas.size() - 1].impresoPart()<<endl;
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
+                                               strcpy(banderitas,Partidas[partida].impresoPart());
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),banderitas,sizeof(banderitas),0);
 
-                                               strcpy(xdd,Partidas[Partidas.size() - 1].impresoPart());
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0);
+                                               strcpy(banderitas,Partidas[partida].impresoPart());
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),banderitas,sizeof(banderitas),0);
 
-                                               strcpy(xdd,"+Ok. Esperando a que el oponente acabe su turno\n");
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),xdd,sizeof(xdd),0); 
+                                               strcpy(banderitas,"+Ok. Esperando a que el oponente acabe su turno\n");
+                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),banderitas,sizeof(banderitas),0); 
 
-                                               strcpy(xdd,"+Ok. Es tu turno\n");
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);  
+                                               strcpy(banderitas,"+Ok. Es tu turno\n");
+                                               send(Partidas[partida].getJugadorTurno().getSocket(),banderitas,sizeof(banderitas),0);  
                                             }
-                                            if(status == -1)
+                                            if(status == -1) //Ya habia una bandera ahi
                                             {
-                                                
+                                                char aviso[255];
+                                                bzero(aviso, sizeof(aviso));
+                                                strcpy(aviso, "-Err. Ya hay una bandera tuya en esa casilla, pruebe otra vez");
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);  
                                             }
                                         }
-                                        
                                     }
-                                    
-                                    }
-                                
+                                }
                                 else
                                     send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no es tu turno\n",sizeof("-Err. Accion invalida, no es tu turno\n"),0); 
                             }
                             else
                                send(Jugadores[jugador].getSocket(),"-Err. Accion invalida, no estas en partida\n",sizeof("-Err. Accion invalida, no estas en partida\n"),0); 
                           pthread_mutex_unlock (&sem);
-
                         }
+
                         if(strncmp("HELP",buffer,4)== 0)
                         {
 
                         }
+
                         if(entra==false)
                         {
                             busca = localizaJugador(i,Jugadores);

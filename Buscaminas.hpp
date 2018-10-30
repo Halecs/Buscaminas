@@ -35,7 +35,7 @@ class Buscaminas{
       for(int i=0;i<10;i++)
           buscaminas_[i].resize(10);  
       srand(time(NULL)); 
-      nBanderas_.resize(2,0);
+      nBanderas_.resize(3,0);
       nMinas_=20;     
       generarPartida();    
      }
