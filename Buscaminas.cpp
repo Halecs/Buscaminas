@@ -132,7 +132,7 @@ bool Buscaminas::ponerBandera(int i,int j, int jugador)
 /*Devuelve 1 si hay mina, 0 si se ha descubierto correctamente, -1 si ha habido un error */
 int Buscaminas::descubrirCasilla(int i,int j)
 {
-	if(!buscaminas_[i][j].descubierto)
+	if((!buscaminas_[i][j].descubierto)&&(buscaminas_[i][j].bandera==0))
 	{
 		buscaminas_[i][j].descubierto = true;
     if((buscaminas_[i][j].minasAlrededor==0)&&(!buscaminas_[i][j].mina))
@@ -160,6 +160,62 @@ bool Buscaminas::CasillaDescubierta(std::string letra, int j)
   int i=letraNumero(letra);
 
   return buscaminas_[i][j].descubierto;
+}
+
+std::string Buscaminas::imprimirTodo(){
+
+    std::string impreso;
+  impreso="  A B C D E F G H I J"; 
+  for (int i = 0; i < buscaminas_.size(); ++i)
+  {
+    impreso+="\n";
+    for (int j = 0; j < buscaminas_.size(); ++j)
+    {
+      if (j == 0)
+      {
+        int aux = i; 
+        impreso += std::to_string(aux++);
+        impreso += " ";
+
+      }      
+      if(!buscaminas_[i][j].mina)
+        {
+          impreso+=std::to_string(buscaminas_[i][j].minasAlrededor);impreso+=" ";
+        }
+      else 
+       impreso+="* ";
+ }
+
+}
+return impreso;
+}
+
+std::string Buscaminas::casillasDesc(){
+
+    std::string impreso;
+  impreso="  A B C D E F G H I J"; 
+  for (int i = 0; i < buscaminas_.size(); ++i)
+  {
+    impreso+="\n";
+    for (int j = 0; j < buscaminas_.size(); ++j)
+    {
+      if (j == 0)
+      {
+        int aux = i; 
+        impreso += std::to_string(aux++);
+        impreso += " ";
+
+      }      
+      if(buscaminas_[i][j].descubierto)
+        {
+          impreso+="1";impreso+=" ";
+        }
+      else 
+       impreso+="0 ";
+     }   
+
+  }
+return impreso;
 }
 
 int Buscaminas::letraNumero(std::string letra)

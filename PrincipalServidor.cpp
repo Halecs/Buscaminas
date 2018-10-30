@@ -29,7 +29,9 @@ int buscarJugadorPartida(Jugador j, std::vector<Partida> partidas);
 int localizaJugador(string nombre, std::vector<Jugador> v);
 void escribirfichero(string nombrefich, Jugador j);
 void eliminar_partida(std::vector<Partida> &p,int partida);
-
+bool isInteger(const std::string & s);
+void tableroPartida(int s,std::vector<Partida> p);
+void imprimirPartidas(std::vector<Partida> p);
 
 static pthread_mutex_t sem = PTHREAD_MUTEX_INITIALIZER;
 
@@ -171,10 +173,17 @@ int main(int argc, char const *argv[])
                         {
                         imprimirJugadores(Jugadores);
                         }
-                       else if("Lista de partidas" == entrada)
+                       if("Lista de partidas" == entrada)
                         {
                         imprimirPartidas(Partidas);
                         }
+                       if(strncmp("Tablero partida",entrada.c_str(),15)==0){
+                         std::string s=entrada;
+                         s=s.substr(16);
+                         if(isInteger(s)) tableroPartida(std::stoi(s),Partidas);
+                         else cout<<"Comando erroneo, el valor no es un int"<<endl;
+                        }
+                     }
             	}
             	else
             	{
@@ -441,7 +450,7 @@ int main(int argc, char const *argv[])
                                                char xdd[255];
                                                bzero(xdd,sizeof(xdd));
 
-                                               std::cout<<"1"<<Partidas[partida].impresoPart()<<endl;
+                                               //std::cout<<"1"<<Partidas[partida].impresoPart()<<endl;
                                                strcpy(xdd,Partidas[partida].impresoPart());
                                                send(Partidas[partida].getJugadorTurno().getSocket(),xdd,sizeof(xdd),0);
 
@@ -706,7 +715,7 @@ void imprimirPartidas(std::vector<Partida> p){
     {
         for (int i = 0; i < p.size(); ++i)
         {
-            std::cout<<"Partida "<<i<<" entre el jugador "<<p[i].Jugador1().getNombre()<<" y "<<p[i].Jugador1().getNombre()<<std::endl;
+            std::cout<<"Partida "<<i<<" entre el jugador "<<p[i].Jugador1().getNombre()<<" y "<<p[i].Jugador2().getNombre()<<"y es el turno de "<<p[i].getTurno()<<std::endl;
         }
 
     }
@@ -714,3 +723,25 @@ void imprimirPartidas(std::vector<Partida> p){
         std::cout<<"No hay partidas actualmente"<<std::endl;
 }
 
+ bool isInteger(const std::string & s)
+{
+   if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
+
+   char * p ;
+   strtol(s.c_str(), &p, 10) ;
+
+   return (*p == 0) ;
+}
+
+
+void tableroPartida(int s,std::vector<Partida> p){
+   if(s>=p.size()){
+       cout<<"ERROR, partida no existente"<<endl;
+       return;
+     }
+   else{
+      cout<<"TABLERO COMPLETO\n"<<p[s].getTablero().imprimirTodo()<<"\n\n";
+      cout<<"TABLERO DE LOS JUGADORES\n"<<p[s].getTablero().imprimir()<<"\n\n";
+      cout<<"CASILLAS DESCUBIERTAS\n"<<p[s].getTablero().casillasDesc()<<"\n\n";
+       }
+}

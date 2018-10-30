@@ -30,7 +30,7 @@ int Partida::ponerBandera(std::string letra,int j,int jugador)
   jugador++;
   if(!busc_.ponerBandera(j,i, jugador)) 
     return -1;
-  else 
+  else{ 
     if(busc_.getBanderasJugador(jugador) == 10) 
       return 1;
     else
@@ -38,6 +38,7 @@ int Partida::ponerBandera(std::string letra,int j,int jugador)
       turno_=(turno_+1)%2; 
       return 0;
     }
+  }
 }
 
 int Partida::letraNumero(std::string letra)

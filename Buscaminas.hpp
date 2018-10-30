@@ -47,7 +47,9 @@ class Buscaminas{
     std::string imprimir();
     bool ponerBandera(int i,int j, int jugador);
     int  descubrirCasilla(int i, int j);
-
+    std::string imprimirTodo();
+    std::string casillasDesc();
+     
 };
 
 
