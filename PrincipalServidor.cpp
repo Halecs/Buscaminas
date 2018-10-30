@@ -552,7 +552,7 @@ int main(int argc, char const *argv[])
                                             {
                                                 char aviso[255];
                                                 bzero(aviso, sizeof(aviso));
-                                                strcpy(aviso, "-Err. Ya hay una bandera tuya en esa casilla, pruebe otra vez");
+                                                strcpy(aviso, "-Err. Ya hay una bandera tuya en esa casilla o la casilla esta descubierta, pruebe otra vez");
                                                 send(Partidas[partida].getJugadorTurno().getSocket(),aviso,sizeof(aviso),0);  
                                             }
                                         }
