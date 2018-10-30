@@ -166,10 +166,15 @@ int main(int argc, char const *argv[])
             			close(sd);
             			exit(-1);
             		}
-                    else if("Lista de jugadores" == entrada)
-                    {
+                    else{
+                       if("Lista de jugadores" == entrada)
+                        {
                         imprimirJugadores(Jugadores);
-                    }
+                        }
+                       else if("Lista de partidas" == entrada)
+                        {
+                        imprimirPartidas(Partidas);
+                        }
             	}
             	else
             	{
@@ -695,3 +700,17 @@ void escribirfichero(string nombrefich, Jugador j)
         std::cout<<"error\n";
 
 }
+
+void imprimirPartidas(std::vector<Partida> p){
+    if(p.size() != 0)
+    {
+        for (int i = 0; i < p.size(); ++i)
+        {
+            std::cout<<"Partida "<<i<<" entre el jugador "<<p[i].Jugador1().getNombre()<<" y "<<p[i].Jugador1().getNombre()<<std::endl;
+        }
+
+    }
+    else
+        std::cout<<"No hay partidas actualmente"<<std::endl;
+}
+
