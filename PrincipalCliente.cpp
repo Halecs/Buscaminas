@@ -13,7 +13,11 @@
 
 void decodTablero(char* buffer);
 
-int main(){
+int main(int argc, char **argv){
+  if(argc<2){
+     std::cout<<"Introduce la ip"<<std::endl;
+     return -1;
+    }
   int sd;
     struct sockaddr_in sockname;
     socklen_t len_sockname;
@@ -30,7 +34,7 @@ int main(){
 
  	sockname.sin_family = AF_INET;
 	sockname.sin_port = htons(2000);
-	sockname.sin_addr.s_addr =  inet_addr("127.0.0.1");
+	sockname.sin_addr.s_addr =  inet_addr(argv[1]);
 
 	
 	len_sockname = sizeof(sockname);
