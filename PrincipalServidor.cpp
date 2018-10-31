@@ -107,6 +107,7 @@ int main(int argc, char const *argv[])
                 aux.setSocket(-1);
                 aux.setPassword(d);
                 aux.setEstado(5);
+                aux.setAux(-1);
                 Jugadores.push_back(aux);
             }
             getline(fich,s,' ');
@@ -293,7 +294,7 @@ int main(int argc, char const *argv[])
                             string pass=buffer;
                             string asd = pass.substr(9,string::npos);
                             busca = localizaJugador(i,Jugadores);
-                            if(Jugadores[Jugadores[busca].getAux()].getEstado() == ESPERANDO_PASSWORD or Jugadores[busca].getEstado() == ESPERANDO_PASSWORD)
+                            if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD or (Jugadores[busca].getAux() != -1 && (Jugadores[Jugadores[busca].getAux()].getEstado() == ESPERANDO_PASSWORD  )))
                             {
                                 if(Jugadores[busca].getPassword().length() == 0)
                                 {
@@ -442,14 +443,23 @@ int main(int argc, char const *argv[])
                                             int status = Partidas[partida].descubrirCasilla(letra,num);
                                             if(status == 1) //Ha perdido
                                             {
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n",sizeof("+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n"),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n",sizeof("+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n"),0);
-                                               Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
-                                               Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
-                                               send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
-                                               send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
-                                               //eliminar_partida(Partidas,partida);
-                                               Partidas.erase(Partidas.begin() + partida);
+                                                char perdida[255];
+                                                bzero(perdida,sizeof(perdida));
+
+                                                strcpy(perdida,"+Ok.Has pisado una mina. Has perdido y problablemente has muerto\n");
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),perdida,sizeof(perdida),0);
+
+                                                strcpy(perdida,"+Ok.El otro jugador ha pisado una mina y ahora esta muerto. Has ganado\n");
+                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),perdida,sizeof(perdida),0);
+
+                                                Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                                Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
+                                                
+                                                strcpy(perdida,"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n");
+                                                send(Partidas[partida].getJugadorTurno().getSocket(),perdida,sizeof(perdida),0);
+                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),perdida,sizeof(perdida),0);
+                                                //eliminar_partida(Partidas,partida);
+                                                Partidas.erase(Partidas.begin() + partida);
                                             }
                                             if(status==0)
                                             {
