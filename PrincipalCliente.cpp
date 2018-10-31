@@ -67,7 +67,11 @@ int main(int argc, char **argv){
                 std::cout<<"Desconectado del servidor correctamente"<<std::endl;
             }
             else{
-               if(strncmp(buffer,"+Ok.Tablero.",12)==0) decodTablero(buffer);
+               if(strncmp(buffer,"+Ok.Tablero.",12)==0) 
+                {
+                    system("clear");
+                    decodTablero(buffer);
+                }
                else std::cout<<buffer<<std::endl;
             }
         }

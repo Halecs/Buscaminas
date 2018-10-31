@@ -142,6 +142,7 @@ int main(int argc, char const *argv[])
                     	Jugador aux;
                     	aux.setSocket(new_sd);
                     	aux.setEstado(0);
+                        aux.setAux(-1);
                     	string mensaje = "+Ok. Conectado al servidor\n";
                     	send(aux.getSocket(),mensaje.c_str(),mensaje.size(),0);
                         string ayuda ="Para ver todos los comandos escriba \"HELP\"\n";
@@ -294,27 +295,32 @@ int main(int argc, char const *argv[])
                             string pass=buffer;
                             string asd = pass.substr(9,string::npos);
                             busca = localizaJugador(i,Jugadores);
-                            if(Jugadores[busca].getEstado() == ESPERANDO_PASSWORD or (Jugadores[busca].getAux() != -1 && (Jugadores[Jugadores[busca].getAux()].getEstado() == ESPERANDO_PASSWORD  )))
+                            int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
+                            if(r == -1)
+                                send(Jugadores[busca].getSocket(),"-Err. No has introducido el usuario\n",sizeof("-Err. No has introducido el usuario\n"),0);
+                            else
                             {
-                                if(Jugadores[busca].getPassword().length() == 0)
+                                if(Jugadores[Jugadores[busca].getAux()].getEstado() == ESPERANDO_PASSWORD )
                                 {
-                                    if(asd.compare(0,asd.size()-1,Jugadores[Jugadores[busca].getAux()].getPassword()) == 0)
+                                    if(Jugadores[busca].getPassword().length() == 0)
                                     {
-                                       //std::cout<<Jugadores[busca].getAux()<<"xdxd"<<busca<<endl; //Son iguales 
-                                       int r=Jugadores[busca].getAux(); //Se guarda en r la posicion del jugador que va a reemplazar al actual
-                                       send(Jugadores[busca].getSocket(),"+Ok. Usuario validado\n",sizeof("+Ok. Usuario validado\n"),0);
-                                       Jugadores[r].setSocket(Jugadores[busca].getSocket());
-                                       Jugadores.erase(Jugadores.begin()+busca);
-                                       Jugadores[r].setEstado(REGISTRADO_SIN_PARTIDA);   
+                                        if(asd.compare(0,asd.size()-1,Jugadores[Jugadores[busca].getAux()].getPassword()) == 0)
+                                        {
+                                           //std::cout<<Jugadores[busca].getAux()<<"xdxd"<<busca<<endl; //Son iguales 
+                                           send(Jugadores[busca].getSocket(),"+Ok. Usuario validado\n",sizeof("+Ok. Usuario validado\n"),0);
+                                           Jugadores[r].setSocket(Jugadores[busca].getSocket());
+                                           Jugadores.erase(Jugadores.begin()+busca);
+                                           Jugadores[r].setEstado(REGISTRADO_SIN_PARTIDA);   
+                                        }
+                                        else 
+                                            send(Jugadores[busca].getSocket(),"-Err. Password incorrecta\n",sizeof("-Err. Password incorrecta\n"),0); 
                                     }
                                     else 
-                                        send(Jugadores[busca].getSocket(),"-Err. Password incorrecta\n",sizeof("-Err. Password incorrecta\n"),0); 
+                                       send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion\n",sizeof("-Err. No se puede realizar la accion\n"),0); 
                                 }
                                 else 
-                                   send(Jugadores[busca].getSocket(),"-Err. No se puede realizar la accion\n",sizeof("-Err. No se puede realizar la accion\n"),0); 
+                                   send(Jugadores[busca].getSocket(),"-Err. Accion invalida\n",sizeof("-Err. Accion invalida\n"),0); 
                             }
-                            else 
-                               send(Jugadores[busca].getSocket(),"-Err. Accion invalida\n",sizeof("-Err. Accion invalida\n"),0); 
                         }
                          
                         if(strncmp("REGISTRO ",buffer,9)==0)
