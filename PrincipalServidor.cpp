@@ -32,6 +32,7 @@ void eliminar_partida(std::vector<Partida> &p,int partida);
 bool isInteger(const std::string & s);
 void tableroPartida(int s,std::vector<Partida> p);
 void imprimirPartidas(std::vector<Partida> p);
+int localizaPartida(Jugador j1, std::vector<Partida> p);
 
 static pthread_mutex_t sem = PTHREAD_MUTEX_INITIALIZER;
 
@@ -228,9 +229,11 @@ int main(int argc, char const *argv[])
                                     int partida = buscarJugadorPartida(Jugadores[busca], Partidas); //Encontramos la partida
                                     int elotro = Partidas[partida].encontrarJugadorOponente(Jugadores[busca].getSocket()); //Buscamos el socket del otro jugador de la partida
                                     if(elotro == 0) // El jugador 1 es el que se va a salir
-                                    {                            pthread_mutex_lock (&sem);
+                                    {                            
+                                        pthread_mutex_lock (&sem);
                                         send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
                                         send(Partidas[partida].socketJugador1(),"-Err. Un jugador se ha desconectado de la partida, se ha cancelado la partida, para volver a buscar 'INICIAR PARTIDA'\n",sizeof("-Err. Un jugador se ha desconectado de la partida, se ha cancelado la partida, para volver a buscar 'INICIAR PARTIDA'\n"),0);
+                                        Partidas.erase(Partidas.begin() + partida);
                                         salirCliente(i,&readfds,Jugadores);
                                         Jugadores[busca].setEstado(5); 
                                         Jugadores[localizaJugador(Partidas[partida].Jugador1().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
@@ -241,7 +244,8 @@ int main(int argc, char const *argv[])
                                         send(Jugadores[busca].getSocket(),"+Ok. Te has desconectado de la partida\n",sizeof("+Ok. Te has desconectado de la partida\n"),0);
                                         send(Partidas[partida].socketJugador2(),"-Err. Un jugador se ha desconectado de la partida\n",sizeof("-Err. Un jugador se ha desconectado de la partida\n"),0);
                                         salirCliente(i,&readfds,Jugadores);
-                                        Jugadores[busca].setEstado(5); 
+                                        Jugadores[busca].setEstado(5);
+                                        Partidas.erase(Partidas.begin() + partida);
                                         Jugadores[localizaJugador(Partidas[partida].Jugador2().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                     }
                                     pthread_mutex_unlock (&sem);
@@ -419,7 +423,8 @@ int main(int argc, char const *argv[])
                             int jugador = localizaJugador(i,Jugadores);
                             if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
                             {
-                                int partida = Jugadores[jugador].getPartida();
+                                //int partida = Jugadores[jugador].getPartida();
+                                int partida = localizaPartida(Jugadores[jugador], Partidas);
                                 if(Partidas[partida].esTurno(Jugadores[jugador])) //Si es su turno
                                 {
                                     string descubre=buffer;
@@ -443,7 +448,8 @@ int main(int argc, char const *argv[])
                                                Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                                send(Partidas[partida].getJugadorTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
                                                send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
-                                               eliminar_partida(Partidas,partida);
+                                               //eliminar_partida(Partidas,partida);
+                                               Partidas.erase(Partidas.begin() + partida);
                                             }
                                             if(status==0)
                                             {
@@ -496,7 +502,8 @@ int main(int argc, char const *argv[])
                             int jugador = localizaJugador(i,Jugadores);
                             if(Jugadores[jugador].getEstado() == REGISTRADO_JUGANDO) //Si estas en partida
                             {
-                                int partida = Jugadores[jugador].getPartida();
+                                //int partida = Jugadores[jugador].getPartida();
+                                int partida = localizaPartida(Jugadores[jugador], Partidas);
                                 if(Partidas[partida].esTurno(Jugadores[jugador])) //Si es su turno
                                 {
                                     string bandera=buffer;
@@ -543,7 +550,8 @@ int main(int argc, char const *argv[])
                                                 send(Partidas[partida].getJugadorNoTurno().getSocket(),"+Fin del juego, podeis volveros a poner en cola con 'INICIAR PARTIDA'\n",sizeof("+Fin del juego, podemos volveros a poner en cola con 'INICIAR PARTIDA'\n"),0);
                                                 Jugadores[localizaJugador(Partidas[partida].getJugadorNoTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
                                                 Jugadores[localizaJugador(Partidas[partida].getJugadorTurno().getSocket(), Jugadores)].setEstado(REGISTRADO_SIN_PARTIDA);
-                                                eliminar_partida(Partidas,partida);
+                                                //eliminar_partida(Partidas,partida);
+                                                Partidas.erase(Partidas.begin() + partida);
                                             }
                                             if(status==0)
                                             {
@@ -744,4 +752,14 @@ void tableroPartida(int s,std::vector<Partida> p){
       cout<<"TABLERO DE LOS JUGADORES\n"<<p[s].getTablero().imprimir()<<"\n\n";
       cout<<"CASILLAS DESCUBIERTAS\n"<<p[s].getTablero().casillasDesc()<<"\n\n";
        }
+}
+
+int localizaPartida(Jugador j1, std::vector<Partida> p)
+{
+    for (int i = 0; i < p.size(); ++i)
+    {
+        if(p[i].existeJugador(j1))
+            return i;
+    }
+    return -1;
 }
